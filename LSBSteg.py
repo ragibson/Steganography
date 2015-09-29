@@ -114,9 +114,8 @@ def hide_data():
     prepare_hide()
     reset_buffer()
     
-    # (x,y) is the position of the current pixel.
-    x = 0
-    y = 0
+    color_data = list(image.getdata())
+    color_data_index = 0
 
     # We add the size of the input file to the beginning of the buffer.
     buffer += get_filesize(input_file_path)
@@ -124,8 +123,12 @@ def hide_data():
     
     print("Hiding", buffer, "bytes")
     
-    while (buffer_length != -1 and y < image.size[1]):
-        rgb = list(image.getpixel((x, y)))
+    if (buffer * 8 + buffer_length > max_bits_to_hide()):
+        print("Only able to hide", max_bits_to_hide() // 8, "B in image. PROCESS WILL FAIL!")
+    mask = and_mask(0, num_lsb)
+    
+    while (buffer_length != -1):
+        rgb = list(color_data[color_data_index])
         for i in range(3):
             if(buffer_length < num_lsb):
                 # If we need more data in the buffer, add a byte from the file to it.
@@ -133,15 +136,12 @@ def hide_data():
             if (buffer_length != -1):
                 # Replace the num_lsb least significant bits of each color
                 # channel with the first num_lsb bits from the buffer.
-                rgb[i] &= and_mask(0, num_lsb)
+                rgb[i] &= mask
                 rgb[i] |= read_bits_from_buffer(num_lsb)
-                
-        image.putpixel((x, y), tuple(rgb))
+        color_data[color_data_index] = tuple(rgb)
+        color_data_index += 1
             
-        x += 1
-        if (x >= image.size[0]):
-            x = 0
-            y += 1
+    image.putdata(color_data)
     image.save(steg_image_path)
     stop = timeit.default_timer()
     print("Runtime: {0:.2f} s".format(stop - start))
@@ -154,39 +154,31 @@ def recover_data():
     prepare_recover()
     reset_buffer()
     
-    x = 0
-    y = 0
+    color_data = list(steg_image.getdata())
+    color_data_index = 0
     
     pixels_used_for_filesize = math.ceil(bits_in_max_filesize() / (3 * num_lsb))
     for i in range(pixels_used_for_filesize):
-        rgb = list(steg_image.getpixel((x, y)))
+        rgb = list(color_data[color_data_index])
+        color_data_index += 1
         for i in range(3):
             # Add the num_lsb least significant bits 
             # of each color channel to the buffer.
             buffer += (rgb[i] % (1 << num_lsb) << buffer_length)
             buffer_length += num_lsb
-        
-        x += 1
-        if (x > steg_image.size[0]):
-            x = 0
-            y += 1
     
     # Get the size of the file we need to recover.
     bytes_to_recover = read_bits_from_buffer(bits_in_max_filesize())
     print("Looking to recover", bytes_to_recover, "bytes")
 
     while (bytes_to_recover > 0):        
-        rgb = list(steg_image.getpixel((x, y)))
+        rgb = list(color_data[color_data_index])
+        color_data_index += 1
         for i in range(3):
             # Add the num_lsb least significant bits 
             # of each color channel to the buffer.
             buffer += (rgb[i] % (1 << num_lsb)) << buffer_length
             buffer_length += num_lsb
-            
-        x += 1
-        if (x >= steg_image.size[0]):
-            x = 0
-            y += 1
         
         while (buffer_length >= 8 and bytes_to_recover > 0):
             # If we have more than a byte in the buffer, write it to the output file
@@ -204,6 +196,6 @@ def analysis():
     # Find how much data we can hide and the size of the data to be hidden
     prepare_hide()
     print("Image resolution: (", image.size[0], ",", image.size[1], ")")
-    print("Using", num_lsb, "LSBs, we can hide: \t", int(max_bits_to_hide() / 8), "B")
+    print("Using", num_lsb, "LSBs, we can hide: \t", max_bits_to_hide() // 8, "B")
     print("Size of input file: \t\t", get_filesize(input_file_path), "B")
     print("Filesize tag: \t\t\t", math.ceil(bits_in_max_filesize() / 8), "B")

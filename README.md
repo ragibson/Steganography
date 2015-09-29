@@ -56,7 +56,7 @@ command hide_data() will produce output similar to the following:
 
     >>> hide_data()
     Hiding 1566763 bytes
-    Runtime: 16.97 s
+    Runtime: 9.02 s
 
 ### Recovering Data
 Using num_lsb, steg_image_path, and output_file_path we recover data from the
@@ -65,4 +65,4 @@ recover_data() will produce output similar to the following:
 
     >>> recover_data()
     Looking to recover 1566763 bytes
-    Runtime: 8.25 s
+    Runtime: 5.18 s
