@@ -63,7 +63,7 @@ def reset_buffer():
 
 def and_mask(index, n):
     # Returns an int used to set n bits to 0 from the index:th bit when using
-    # bitwise AND on a integer of 8 bits or less.
+    # bitwise AND on an integer of 8 bits or less.
     # Ex: and_mask(3,2) --> 0b11100111 = 231.
     return 255 - ((1 << n) - 1 << index)
 
@@ -83,19 +83,6 @@ def max_bits_to_hide():
 def bits_in_max_filesize():
     # Returns the number of bits needed to store the size of the file.
     return max_bits_to_hide().bit_length()
-
-def read_byte_to_buffer():
-    # Reads a byte from the input file and adds it to the buffer.
-    # If the end of file has been reached, its length is set to -1.
-    global buffer, buffer_length
-    
-    new_byte = input_file.read(1)
-    if(new_byte != b''):
-        buffer += int.from_bytes(new_byte, 'big') << buffer_length
-        buffer_length += 8
-    else:
-        buffer = 0
-        buffer_length = -1
         
 def read_bits_from_buffer(n):
     # Removes the first n bits from the buffer and returns them.
@@ -114,6 +101,8 @@ def hide_data():
     prepare_hide()
     reset_buffer()
     
+    data = iter(memoryview(input_file.read()))
+    
     color_data = list(image.getdata())
     color_data_index = 0
 
@@ -127,17 +116,22 @@ def hide_data():
         print("Only able to hide", max_bits_to_hide() // 8, "B in image. PROCESS WILL FAIL!")
     mask = and_mask(0, num_lsb)
     
-    while (buffer_length != -1):
+    done = False
+    while (not done):
         rgb = list(color_data[color_data_index])
         for i in range(3):
             if(buffer_length < num_lsb):
                 # If we need more data in the buffer, add a byte from the file to it.
-                read_byte_to_buffer()
-            if (buffer_length != -1):
-                # Replace the num_lsb least significant bits of each color
-                # channel with the first num_lsb bits from the buffer.
-                rgb[i] &= mask
-                rgb[i] |= read_bits_from_buffer(num_lsb)
+                try:
+                    buffer += next(data) << buffer_length
+                    buffer_length += 8
+                except StopIteration:
+                    # If we've reached the end of our data, we're done
+                    done = True
+            # Replace the num_lsb least significant bits of each color
+            # channel with the first num_lsb bits from the buffer.
+            rgb[i] &= mask
+            rgb[i] |= read_bits_from_buffer(num_lsb)
         color_data[color_data_index] = tuple(rgb)
         color_data_index += 1
             
@@ -153,6 +147,8 @@ def recover_data():
     start = timeit.default_timer()
     prepare_recover()
     reset_buffer()
+    
+    data = bytearray()
     
     color_data = list(steg_image.getdata())
     color_data_index = 0
@@ -181,12 +177,13 @@ def recover_data():
             buffer_length += num_lsb
         
         while (buffer_length >= 8 and bytes_to_recover > 0):
-            # If we have more than a byte in the buffer, write it to the output file
+            # If we have more than a byte in the buffer, add it to data
             # and decrement the number of bytes left to recover.
             bits = read_bits_from_buffer(8)
-            output_file.write(struct.pack('1B', bits))
+            data += struct.pack('1B', bits)
             bytes_to_recover -= 1
 
+    output_file.write(bytes(data))
     output_file.close()
     
     stop = timeit.default_timer()
