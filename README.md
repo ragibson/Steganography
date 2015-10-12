@@ -1,6 +1,11 @@
 # Steganography
 
-## What does LSBSteg do?
+# Table of Contents
+  * [LSBSteg](#LSBSteg)
+  * [StegDetect](#StegDetect)
+
+<a name = "LSBSteg"/>
+## LSBSteg
 LSBSteg uses least significant bit steganography to hide a file in the color
 information of an RGB image (.bmp or .png).
 
@@ -9,11 +14,14 @@ least significant bits of the color value with the data from our file.
 In order to make recovering this data easier, we also hide the filesize
 of our input file in the first few color channels of the image.
 
-# How to use
+### How to use
 You need Python 3 and Pillow, a fork of the Python Imaging Library (PIL).
 
-Run LSBSteg in interactive mode using the following command:
-    py -i LSBSteg.
+Run LSBSteg in interactive mode using one of the following commands:
+    
+	py -i LSBSteg.py
+	# OR
+	python -i LSBSteg.py
 
 Set the following variables, depending on what you want to do.
 
@@ -56,7 +64,7 @@ command hide_data() will produce output similar to the following:
 
     >>> hide_data()
     Hiding 1566763 bytes
-    Runtime: 8.02 s
+    Runtime: 7.22 s
 
 ### Recovering Data
 Using num_lsb, steg_image_path, and output_file_path we recover data from the
@@ -65,4 +73,33 @@ recover_data() will produce output similar to the following:
 
     >>> recover_data()
     Looking to recover 1566763 bytes
-    Runtime: 4.93 s
+    Runtime: 4.44 s
+
+<a name = "StegDetect"/>
+## StegDetect
+StegDetect provides various methods for detecting steganography in images.
+
+### How to Use
+You need Python 3 and Pillow, a fork of the Python Imaging Library (PIL).
+
+Run StegDetect in interactive mode using one of the following commands:
+    
+	py -i StegDetect.py
+	# OR
+	python -i StegDetect.py
+	
+Set the image path.
+
+    # Path of the image
+	# Default is "image_path.png"
+	image_path = "directory\image.png"
+	
+### Showing the Least Significant Bits of an Image
+Using image_path, we sum the least significant n bits of the RGB color channels
+for each pixel and normalize the result to the range 0-255. This value is then
+applied to each color channel for the pixel. Where n is the number of least
+significant bits to show, the command show_LSB(n) will produce output similar to
+the following:
+
+    >>> show_LSB(1)
+    Runtime: 3.55 s

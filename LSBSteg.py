@@ -71,18 +71,15 @@ def get_filesize(path):
     # Returns the filesize in bytes of the file at path
     return os.stat(path).st_size
 
-def max_bits_to_hide():
+def max_bits_to_hide(image):
     # Returns the number of bits we're able to hide in the image
     # using num_lsb least significant bits.
     # 3 color channels per pixel, num_lsb bits per color channel.
-    try:
-        return int(3 * image.size[0] * image.size[1] * num_lsb)
-    except NameError:
-        return int(3 * steg_image.size[0] * steg_image.size[1] * num_lsb)
+    return int(3 * image.size[0] * image.size[1] * num_lsb)
 
-def bits_in_max_filesize():
+def bits_in_max_filesize(image):
     # Returns the number of bits needed to store the size of the file.
-    return max_bits_to_hide().bit_length()
+    return max_bits_to_hide(image).bit_length()
         
 def read_bits_from_buffer(n):
     # Removes the first n bits from the buffer and returns them.
@@ -95,7 +92,7 @@ def read_bits_from_buffer(n):
 
 def hide_data():
     # Hides the data from the input file in the input image.
-    global buffer, buffer_length
+    global buffer, buffer_length, image
     
     start = timeit.default_timer()
     prepare_hide()
@@ -108,12 +105,12 @@ def hide_data():
 
     # We add the size of the input file to the beginning of the buffer.
     buffer += get_filesize(input_file_path)
-    buffer_length += bits_in_max_filesize()
+    buffer_length += bits_in_max_filesize(image)
     
     print("Hiding", buffer, "bytes")
     
-    if (buffer * 8 + buffer_length > max_bits_to_hide()):
-        print("Only able to hide", max_bits_to_hide() // 8, "B in image. PROCESS WILL FAIL!")
+    if (buffer * 8 + buffer_length > max_bits_to_hide(image)):
+        print("Only able to hide", max_bits_to_hide(image) // 8, "B in image. PROCESS WILL FAIL!")
     mask = and_mask(0, num_lsb)
     
     done = False
@@ -142,7 +139,7 @@ def hide_data():
 
 def recover_data():
     # Writes the data from the steganographed image to the output file
-    global buffer, buffer_length
+    global buffer, buffer_length, steg_image
     
     start = timeit.default_timer()
     prepare_recover()
@@ -153,7 +150,7 @@ def recover_data():
     color_data = list(steg_image.getdata())
     color_data_index = 0
     
-    pixels_used_for_filesize = math.ceil(bits_in_max_filesize() / (3 * num_lsb))
+    pixels_used_for_filesize = math.ceil(bits_in_max_filesize(steg_image) / (3 * num_lsb))
     for i in range(pixels_used_for_filesize):
         rgb = list(color_data[color_data_index])
         color_data_index += 1
@@ -164,7 +161,7 @@ def recover_data():
             buffer_length += num_lsb
     
     # Get the size of the file we need to recover.
-    bytes_to_recover = read_bits_from_buffer(bits_in_max_filesize())
+    bytes_to_recover = read_bits_from_buffer(bits_in_max_filesize(steg_image))
     print("Looking to recover", bytes_to_recover, "bytes")
 
     while (bytes_to_recover > 0):        
@@ -193,6 +190,6 @@ def analysis():
     # Find how much data we can hide and the size of the data to be hidden
     prepare_hide()
     print("Image resolution: (", image.size[0], ",", image.size[1], ")")
-    print("Using", num_lsb, "LSBs, we can hide: \t", max_bits_to_hide() // 8, "B")
+    print("Using", num_lsb, "LSBs, we can hide: \t", max_bits_to_hide(image) // 8, "B")
     print("Size of input file: \t\t", get_filesize(input_file_path), "B")
-    print("Filesize tag: \t\t\t", math.ceil(bits_in_max_filesize() / 8), "B")
+    print("Filesize tag: \t\t\t", math.ceil(bits_in_max_filesize(image) / 8), "B")
