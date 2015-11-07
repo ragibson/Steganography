@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 from PIL import Image
+import os
 import timeit
 
 image_path = "image_path.png"
@@ -42,10 +43,12 @@ def show_LSB(n):
         rgb = list(color_data[i])
         for j in range(3):
             rgb[j] &= mask
-        lsb = sum(rgb[:3]) * 255 // (3 * mask)
-        color_data[i] = tuple((lsb, lsb, lsb))
+        normalized_LSBs = sum(rgb[:3]) * 255 // (3 * mask)
+        color_data[i] = tuple((normalized_LSBs, normalized_LSBs, normalized_LSBs))
     
     image.putdata(color_data)
     stop = timeit.default_timer()
     print("Runtime: {0:.2f} s".format(stop - start))
+    file_name, file_extension = os.path.splitext(image_path)
+    image.save(file_name + "_{}LSBs".format(n) + file_extension)
     image.show()
