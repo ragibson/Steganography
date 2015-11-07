@@ -57,6 +57,7 @@ docs/_build/
 target/
 
 # Eclipse Files
+*.settings
 *.project
 *.pydevproject
 
