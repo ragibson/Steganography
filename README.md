@@ -45,6 +45,11 @@ Set the following variables, depending on what you want to do.
 	# Number of least signifcant bits to use when hiding or recovering data
 	# Default is 2
 	num_lsb = 2
+	
+	# How much to compress image when saving as .png
+	# 1 gives best speed, 9 gives best compression
+	# Default is 1
+	compression = 1
 
 ### Analyzing
 Before hiding data in an image, it can useful to see how much data can be hidden.
@@ -58,13 +63,13 @@ produce output similar to the following:
     Filesize tag:                    3 B
 	
 ### Hiding Data
-Using num_lsb, input_image_path, input_file_path, and steg_image_path, we hide
-data in the input image and write the result to the steganographed image. The 
-command hide_data() will produce output similar to the following:
+Using num_lsb, input_image_path, input_file_path, steg_image_path, and compression,
+we hide data in the input image and write the result to the steganographed image.
+The command hide_data() will produce output similar to the following:
 
     >>> hide_data()
     Hiding 1566763 bytes
-    Runtime: 7.22 s
+    Runtime: 6.11 s
 
 ### Recovering Data
 Using num_lsb, steg_image_path, and output_file_path we recover data from the
@@ -98,7 +103,8 @@ Set the image path.
 Using image_path, we sum the least significant n bits of the RGB color channels
 for each pixel and normalize the result to the range 0-255. This value is then
 applied to each color channel for the pixel. Where n is the number of least
-significant bits to show, the command show_LSB(n) will produce output similar to
+significant bits to show, the command show_LSB(n) will save the resulting
+image, appending "_nLSBs" to the file name, and will produce output similar to
 the following:
 
     >>> show_LSB(1)
