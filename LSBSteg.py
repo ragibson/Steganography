@@ -28,9 +28,7 @@ input_image_path = "input_image.png"
 steg_image_path = "steg_image.png"
 input_file_path = "input.zip"
 output_file_path = "output.zip"
-
-buffer = 0
-buffer_length = 0
+compression = 1
 
 # Number of least significant bits containing/to contain data in image
 num_lsb = 2
@@ -88,7 +86,7 @@ def read_bits_from_buffer(n):
     bits = buffer % (1 << n)
     buffer >>= n
     buffer_length -= n
-    return bits 
+    return bits
 
 def hide_data():
     # Hides the data from the input file in the input image.
@@ -133,7 +131,7 @@ def hide_data():
         color_data_index += 1
             
     image.putdata(color_data)
-    image.save(steg_image_path)
+    image.save(steg_image_path, compress_level=compression)
     stop = timeit.default_timer()
     print("Runtime: {0:.2f} s".format(stop - start))
 
