@@ -51,7 +51,7 @@ def prepare_recover():
         steg_image = Image.open(steg_image_path)
         output_file = open(output_file_path, "wb+")
     except FileNotFoundError:
-        print("Steganographed image not found, will not be able to recover data.")
+        print("Steg image not found, will not be able to recover data.")
 
 def reset_buffer():
     global buffer, buffer_length
@@ -108,7 +108,8 @@ def hide_data():
     print("Hiding", buffer, "bytes")
     
     if (buffer * 8 + buffer_length > max_bits_to_hide(image)):
-        print("Only able to hide", max_bits_to_hide(image) // 8, "B in image. PROCESS WILL FAIL!")
+        print("Only able to hide", max_bits_to_hide(image) // 8,
+              "B in image. PROCESS WILL FAIL!")
     mask = and_mask(0, num_lsb)
     
     done = False
@@ -148,7 +149,8 @@ def recover_data():
     color_data = list(steg_image.getdata())
     color_data_index = 0
     
-    pixels_used_for_filesize = math.ceil(bits_in_max_filesize(steg_image) / (3 * num_lsb))
+    pixels_used_for_filesize = math.ceil(bits_in_max_filesize(steg_image)
+                                         / (3 * num_lsb))
     for i in range(pixels_used_for_filesize):
         rgb = list(color_data[color_data_index])
         color_data_index += 1
@@ -157,7 +159,7 @@ def recover_data():
             # of each color channel to the buffer.
             buffer += (rgb[i] % (1 << num_lsb) << buffer_length)
             buffer_length += num_lsb
-    
+
     # Get the size of the file we need to recover.
     bytes_to_recover = read_bits_from_buffer(bits_in_max_filesize(steg_image))
     print("Looking to recover", bytes_to_recover, "bytes")
@@ -188,6 +190,8 @@ def analysis():
     # Find how much data we can hide and the size of the data to be hidden
     prepare_hide()
     print("Image resolution: (", image.size[0], ",", image.size[1], ")")
-    print("Using", num_lsb, "LSBs, we can hide: \t", max_bits_to_hide(image) // 8, "B")
+    print("Using", num_lsb, "LSBs: we can hide\t",
+          max_bits_to_hide(image) // 8, "B")
     print("Size of input file: \t\t", get_filesize(input_file_path), "B")
-    print("Filesize tag: \t\t\t", math.ceil(bits_in_max_filesize(image) / 8), "B")
+    print("Filesize tag: \t\t\t",
+          math.ceil(bits_in_max_filesize(image) / 8), "B")

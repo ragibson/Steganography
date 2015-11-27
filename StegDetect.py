@@ -43,8 +43,8 @@ def show_LSB(n):
         rgb = list(color_data[i])
         for j in range(3):
             rgb[j] &= mask
-        normalized_LSBs = sum(rgb[:3]) * 255 // (3 * mask)
-        color_data[i] = tuple((normalized_LSBs, normalized_LSBs, normalized_LSBs))
+        combined_LSBs = sum(rgb[:3]) * 255 // (3 * mask)
+        color_data[i] = tuple((combined_LSBs, combined_LSBs, combined_LSBs))
     
     image.putdata(color_data)
     stop = timeit.default_timer()
