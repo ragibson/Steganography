@@ -49,7 +49,8 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
         fmt = "{}B".format(num_samples)
         # Used to set the least significant num_lsb bits of an integer to zero
         mask = (1 << 8) - (1 << num_lsb)
-        # The least possible value for a sample in the sound file
+        # The least possible value for a sample in the sound file is actually
+        # zero, but we don't skip any samples for 8 bit depth wav files.
         min_sample = -(1 << 8)
     elif (sample_width == 2):  # samples are signed 16-bit integers
         fmt = "{}h".format(num_samples)
@@ -117,7 +118,8 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
         values.append(struct.pack(fmt[-1], altered_sample))
         
     while(sound_index < len(raw_data)):
-        # At this point, there's no more data to hide.
+        # At this point, there's no more data to hide. So we append the rest of
+        # the samples from the original sound file.
         values.append(struct.pack(fmt[-1], raw_data[sound_index]))
         sound_index += 1
     
@@ -138,7 +140,8 @@ def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
     
     if (sample_width == 1):  # samples are unsigned 8-bit integers
         fmt = "{}B".format(num_samples)
-        # The least possible value for a sample in the sound file
+        # The least possible value for a sample in the sound file is actually
+        # zero, but we don't skip any samples for 8 bit depth wav files.
         min_sample = -(1 << 8)
     elif (sample_width == 2):  # samples are signed 16-bit integers
         fmt = "{}h".format(num_samples)
@@ -198,7 +201,7 @@ try:
                                'output=', 'LSBs=', 'bytes=', 'help'])
 except getopt.GetoptError:
     usage()
-    sys.exit(2)
+    sys.exit(1)
 
 hiding_data = False
 recovering_data = False
@@ -220,7 +223,7 @@ for opt, arg in opts:
         bytes_to_recover = int(arg)
     elif opt in ("--help"):
         usage()
-        sys.exit(2)
+        sys.exit(1)
     else:
         print("Invalid argument {}".format(opt))
 
@@ -233,4 +236,4 @@ except Exception as e:
     print("Ran into an error during execution. Check input and try again.\n")
     print(e)
     usage()
-    sys.exit(2)
+    sys.exit(1)
