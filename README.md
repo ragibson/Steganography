@@ -27,7 +27,7 @@ Run WavSteg with the following command line arguments:
     -b, --bytes=      How many bytes to recover from the sound file
     --help            Display this message
 	
-For example,
+Example:
 
     WavSteg.py -h -s sound.wav -f file.txt -o sound_steg.wav -n 1
 	# OR
@@ -57,6 +57,7 @@ Recovering data requires the arguments -r, -s, -o, -n, and -b
 The following command would recover the hidden data from sound_steg.wav and
 save it as output.txt. This requires the size in bytes of the hidden data to
 be accurate or the result may be too short or contain extraneous data.
+
 Example:
 
     $ WavSteg.py -r -s sound_steg.wav -o output.txt -n 1 -b 1000
