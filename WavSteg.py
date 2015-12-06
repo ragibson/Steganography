@@ -224,7 +224,13 @@ for opt, arg in opts:
     else:
         print("Invalid argument {}".format(opt))
 
-if (hiding_data):
-    hide_data(sound_path, file_path, output_path, num_lsb)
-if (recovering_data):
-    recover_data(sound_path, output_path, num_lsb, bytes_to_recover)
+try:
+    if (hiding_data):
+        hide_data(sound_path, file_path, output_path, num_lsb)
+    if (recovering_data):
+        recover_data(sound_path, output_path, num_lsb, bytes_to_recover)
+except Exception as e:
+    print("Ran into an error during execution. Check input and try again.\n")
+    print(e)
+    usage()
+    sys.exit(2)
