@@ -76,11 +76,12 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
     values = []
     buffer = 0
     buffer_length = 0
+    done = False
     
-    while((data_index // 8) < len(input_data)):
+    while(not done):
         while (buffer_length < num_lsb and data_index // 8 < len(input_data)):
             # If we don't have enough data in the buffer, add the
-            # rest of thex next byte from the file to it.
+            # rest of the next byte from the file to it.
             buffer += (input_data[data_index // 8] >> (data_index % 8)
                         ) << buffer_length
             bits_added = 8 - (data_index % 8)
@@ -91,31 +92,37 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
         current_data = buffer % (1 << num_lsb)
         buffer >>= num_lsb
         buffer_length -= num_lsb
-        
-        while (raw_data[sound_index] == min_sample):
+
+        while (sound_index < len(raw_data) and
+               raw_data[sound_index] == min_sample):
             # If the next sample from the sound file is the smallest possible
             # value, we skip it. Changing the LSB of such a value could cause
             # an overflow and drastically change the sample in the output.
             values.append(struct.pack(fmt[-1], raw_data[sound_index]))
             sound_index += 1
-        current_sample = raw_data[sound_index]
-        sound_index += 1
-        
-        sign = 1
-        if current_sample < 0:
-            # We alter the LSBs of the absolute value of the sample to avoid
-            # problems with two's complement. This also avoids changing a
-            # sample to the smallest possible value, which we would skip when
-            # attempting to recover data.
-            current_sample = -current_sample
-            sign = -1
-        
-        # Bitwise AND with mask turns the num_lsb least significant bits
-        # of current_sample to zero. Bitwise OR with current_data replaces
-        # these least significant bits with the next num_lsb bits of data.
-        altered_sample = sign * ((current_sample & mask) | current_data)
-        
-        values.append(struct.pack(fmt[-1], altered_sample))
+
+        if (sound_index < len(raw_data)):
+            current_sample = raw_data[sound_index]
+            sound_index += 1
+
+            sign = 1
+            if (current_sample < 0):
+                # We alter the LSBs of the absolute value of the sample to
+                # avoid problems with two's complement. This also avoids
+                # changing a sample to the smallest possible value, which we
+                # would skip when attempting to recover data.
+                current_sample = -current_sample
+                sign = -1
+
+            # Bitwise AND with mask turns the num_lsb least significant bits
+            # of current_sample to zero. Bitwise OR with current_data replaces
+            # these least significant bits with the next num_lsb bits of data.
+            altered_sample = sign * ((current_sample & mask) | current_data)
+
+            values.append(struct.pack(fmt[-1], altered_sample))
+
+        if (data_index // 8 >= len(input_data) and buffer_length <= 0):
+            done = True
         
     while(sound_index < len(raw_data)):
         # At this point, there's no more data to hide. So we append the rest of
@@ -153,7 +160,7 @@ def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
     
     # Put all the samples from the sound file into a list
     raw_data = list(struct.unpack(fmt, sound.readframes(num_frames)))
-    # Used to set the least significant num_lsb bits of an integer to zero
+    # Used to extract the least significant num_lsb bits of an integer
     mask = (1 << num_lsb) - 1
     output_file = open(output_path, "wb+")
     
