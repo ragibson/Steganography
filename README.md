@@ -5,7 +5,7 @@
   * [LSBSteg](#LSBSteg)
   * [StegDetect](#StegDetect)
 
-<a name = "WavSteg"/>
+<a name = "WavSteg"></a>
 ## WavSteg
 WavSteg uses least significant bit steganography to hide a file in the samples
 of a .wav file.
@@ -62,7 +62,7 @@ Example:
 
     $ WavSteg.py -r -s sound_steg.wav -o output.txt -n 1 -b 1000
   
-<a name = "LSBSteg"/>
+<a name = "LSBSteg"></a>
 ## LSBSteg
 LSBSteg uses least significant bit steganography to hide a file in the color
 information of an RGB image (.bmp or .png).
@@ -138,7 +138,7 @@ recover_data() will produce output similar to the following:
     Looking to recover 1566763 bytes
     Runtime: 4.44 s
 
-<a name = "StegDetect"/>
+<a name = "StegDetect"></a>
 ## StegDetect
 StegDetect provides one method for detecting simple steganography in images.
 
