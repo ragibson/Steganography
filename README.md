@@ -110,9 +110,9 @@ Set the following variables, depending on what you want to do.
 	compression = 1
 
 ### Analyzing
-Before hiding data in an image, it can useful to see how much data can be hidden.
-Using num_lsb, input_image_path, and input_file_path, the command analysis() will
-produce output similar to the following:
+Before hiding data in an image, it can useful to see how much data can be
+hidden. Using num_lsb, input_image_path, and input_file_path, the command
+analysis() will produce output similar to the following:
 
     >>> analysis()
     Image resolution: ( 2000 , 1100 )
@@ -121,9 +121,10 @@ produce output similar to the following:
     Filesize tag:                    3 B
 	
 ### Hiding Data
-Using num_lsb, input_image_path, input_file_path, steg_image_path, and compression,
-we hide data in the input image and write the result to the steganographed image.
-The command hide_data() will produce output similar to the following:
+Using num_lsb, input_image_path, input_file_path, steg_image_path, and
+compression, we hide data in the input image and write the result to the
+steganographed image. The command hide_data() will produce output similar to
+the following:
 
     >>> hide_data()
     Hiding 1566763 bytes
@@ -145,25 +146,19 @@ StegDetect provides one method for detecting simple steganography in images.
 ### How to Use
 You need Python 3 and Pillow, a fork of the Python Imaging Library (PIL).
 
-Run StegDetect in interactive mode using one of the following commands:
-    
-	py -i StegDetect.py
-	# OR
-	python -i StegDetect.py
-	
-Set the image path.
+Run StegDetect with the following command line arguments:
 
-    # Path of the image
-	# Default is "image_path.png"
-	image_path = "directory\image.png"
+    Command Line Arguments:
+     -f, --file=       Path to an image
+     -n, --LSBs=       How many LSBs to display
+     --help            Display this message
 	
 ### Showing the Least Significant Bits of an Image
-Using image_path, we sum the least significant n bits of the RGB color channels
-for each pixel and normalize the result to the range 0-255. This value is then
-applied to each color channel for the pixel. Where n is the number of least
-significant bits to show, the command show_LSB(n) will save the resulting
-image, appending "_nLSBs" to the file name, and will produce output similar to
-the following:
+We sum the least significant n bits of the RGB color channels for each pixel
+and normalize the result to the range 0-255. This value is then applied to each
+color channel for the pixel. Where n is the number of least significant bits to
+show, the following command will save the resulting image, appending "_nLSBs"
+to the file name, and will produce output similar to the following:
 
-    >>> show_LSB(1)
+    $ StegDetect.py -f image.png -n 2
     Runtime: 3.55 s

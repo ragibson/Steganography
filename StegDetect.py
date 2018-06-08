@@ -9,8 +9,8 @@
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 # 
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 # 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,35 +20,75 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from PIL import Image
+import getopt
 import os
+from PIL import Image
+import sys
 import timeit
 
-image_path = "image_path.png"
 
-def show_LSB(n):
-    # Shows the n least significant bits of image
+def show_lsb(image_path, n):
+    """Shows the n least significant bits of image"""
     start = timeit.default_timer()
-    try:
-        image = Image.open(image_path)
-    except NameError:
-        print("Cannot find image")
-    
+
+    image = Image.open(image_path)
+
     # Used to set everything but the least significant n bits to 0 when
     # using bitwise AND on an integer
     mask = ((1 << n) - 1)
-    
+
     color_data = list(image.getdata())
-    for i in range (len(color_data)):
+    for i in range(len(color_data)):
         rgb = list(color_data[i])
         for j in range(3):
             rgb[j] &= mask
-        combined_LSBs = sum(rgb[:3]) * 255 // (3 * mask)
-        color_data[i] = tuple((combined_LSBs, combined_LSBs, combined_LSBs))
-    
+        combined_lsb = sum(rgb[:3]) * 255 // (3 * mask)
+        color_data[i] = (combined_lsb, combined_lsb, combined_lsb)
+
     image.putdata(color_data)
     stop = timeit.default_timer()
     print("Runtime: {0:.2f} s".format(stop - start))
     file_name, file_extension = os.path.splitext(image_path)
     image.save(file_name + "_{}LSBs".format(n) + file_extension)
-    image.show()
+
+
+def usage():
+    print("\nCommand Line Arguments:\n",
+          "-f, --file=       Path to an image\n",
+          "-n, --LSBs=       How many LSBs to display\n",
+          "--help            Display this message\n")
+
+
+if __name__ == "__main__":
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'f:n:',
+                                   ['file=', 'LSBs=', 'help'])
+    except getopt.GetoptError:
+        usage()
+        sys.exit(1)
+
+    # file paths for input file
+    input_fp = ""
+
+    # number of least significant bits to display
+    num_bits = 2
+
+    for opt, arg in opts:
+        if opt in ("-f", "--file"):
+            input_fp = arg
+        elif opt in ("-n", "--LSBs="):
+            num_bits = int(arg)
+        elif opt == "--help":
+            usage()
+            sys.exit(1)
+        else:
+            print("Invalid argument {}".format(opt))
+
+    try:
+        show_lsb(input_fp, num_bits)
+    except Exception as e:
+        print("Ran into an error during execution.\n",
+              "Check input and try again.\n")
+        print(e)
+        usage()
+        sys.exit(1)
