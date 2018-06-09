@@ -222,7 +222,7 @@ if __name__ == "__main__":
     recovering_data = False
     num_bytes_to_recover = 0
 
-    # file paths for input file, sound, and output file
+    # file paths for input, sound, and output files
     sound_fp = ""
     input_fp = ""
     output_fp = ""
@@ -253,7 +253,6 @@ if __name__ == "__main__":
 
     try:
         if hiding_data:
-            print(sound_fp, input_fp, output_fp, num_bits)
             hide_data(sound_fp, input_fp, output_fp, num_bits)
         if recovering_data:
             recover_data(sound_fp, output_fp, num_bits, num_bytes_to_recover)
