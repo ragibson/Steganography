@@ -69,73 +69,56 @@ information of an RGB image (.bmp or .png).
 
 For each color channel (R,G,B) in each pixel of the image, we overwrite the
 least significant bits of the color value with the data from our file.
-In order to make recovering this data easier, we also hide the filesize
+In order to make recovering this data easier, we also hide the file size
 of our input file in the first few color channels of the image.
 
 ### How to use
 You need Python 3 and Pillow, a fork of the Python Imaging Library (PIL).
 
-Run LSBSteg in interactive mode using one of the following commands:
-    
-	py -i LSBSteg.py
-	# OR
-	python -i LSBSteg.py
+Run LSBSteg with the following command line arguments:
 
-Set the following variables, depending on what you want to do.
+    Command Line Arguments:
+     -h, --hide           To hide data in an image
+     -r, --recover        To recover data from an image
+     -a, --analyze        Print how much data can be hidden in image
+     -i, --image=         Path to a bitmap (.bmp or .png) image
+     -f, --file=          Path to a file to hide in the image
+     -o, --output=        Path to an output file
+     -n, --LSBs=          How many LSBs to use
+     -c, --compression=   1 (best speed) to 9 (smallest file size)
+     --help               Display this message
 
-    # Path of the image to hide data in
-	# Default is "input_image.png"
-	input_image_path = "directory\input_image.png"
-	
-	# Path of the image to recover data from OR
-	# Path to write steganographed image
-	# Default is "steg_image.png"
-	steg_image_path = "directory\steg_image.png"
-	
-	# Path of file to hide in image
-	# Default is "input.zip"
-	input_file_path = "directory\input_file.zip"
-	
-	# Path of file to recover data to
-	# Default is "output.zip"
-	output_file_path = "directory\output_file.zip"
-	
-	# Number of least signifcant bits to use when hiding or recovering data
-	# Default is 2
-	num_lsb = 2
-	
-	# How much to compress image when saving as .png
-	# 1 gives best speed, 9 gives best compression
-	# Default is 1
-	compression = 1
+Example:
+
+    LSBSteg.py -a -i input_image.png -f input_file.zip -n 2
+    # OR
+    LSBSteg.py -h -i input_image.png -f input_file.zip -o steg.png -n 2 -c 1
+    # OR
+    LSBSteg.py -r -i steg.png -o output_file.zip -n 2
 
 ### Analyzing
 Before hiding data in an image, it can useful to see how much data can be
-hidden. Using num_lsb, input_image_path, and input_file_path, the command
-analysis() will produce output similar to the following:
+hidden. The following command will achieve this, producing output similar to
 
-    >>> analysis()
-    Image resolution: ( 2000 , 1100 )
-    Using 2 LSBs, we can hide:       1650000 B
-    Size of input file:              1566763 B
-    Filesize tag:                    3 B
+    $ LSBSteg.py -a -i input_image.png -f input_file.zip -n 2
+    Image resolution: (2000, 1100)
+    Using 2 LSBs, we can hide:      1650000 B
+    Size of input file:             1566763 B
+    File size tag:                  3 B
 	
 ### Hiding Data
-Using num_lsb, input_image_path, input_file_path, steg_image_path, and
-compression, we hide data in the input image and write the result to the
-steganographed image. The command hide_data() will produce output similar to
-the following:
+The following command will hide data in the input image and write the result to
+the steganographed image, producing output similar to
 
-    >>> hide_data()
+    $ LSBSteg.py -h -i input_image.png -f input_file.zip -o steg.png -n 2 -c 1
     Hiding 1566763 bytes
     Runtime: 6.11 s
 
 ### Recovering Data
-Using num_lsb, steg_image_path, and output_file_path we recover data from the
-steganographed image and write the result to the output file. The command
-recover_data() will produce output similar to the following:
+The following command will recover data from the steganographed image and write
+the result to the output file, producing output similar to
 
-    >>> recover_data()
+    $ LSBSteg.py -r -i steg.png -o output_file.zip -n 2
     Looking to recover 1566763 bytes
     Runtime: 4.44 s
 
