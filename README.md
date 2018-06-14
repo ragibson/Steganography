@@ -1,9 +1,46 @@
 # Steganography
 
 # Table of Contents
+  * [Byte Sequence Manipulation](#ByteSequenceManipulation)
   * [WavSteg](#WavSteg)
   * [LSBSteg](#LSBSteg)
   * [StegDetect](#StegDetect)
+
+<a name = "ByteSequenceManipulation"></a>
+## Byte Sequence Manipulation
+bit_manipulation provides the ability to (quickly) interleave the bytes of a
+payload directly in the least significant bits of a carrier byte sequence.
+
+Specifically, it contains four primary functions:
+
+    # Interleave the bytes of payload into the num_lsb LSBs of carrier.
+    lsb_interleave_bytes(carrier, payload, num_lsb, truncate=False)
+
+    # Deinterleave num_bits bits from the num_lsb LSBs of carrier.
+    lsb_deinterleave_bytes(carrier, num_bits, num_lsb)
+
+    # Runs lsb_interleave_bytes with a List[uint8] carrier.
+    lsb_interleave_list(carrier, payload, num_lsb)
+
+    # Runs lsb_deinterleave_bytes with a List[uint8] carrier.
+    lsb_deinterleave_list(carrier, num_bits, num_lsb)
+
+Running `bit_manipulation.py` or calling its `test()` function directly should
+produce output similar to
+
+    Testing 1.0 MB payload -> 10.0 MB carrier...
+    Progress: [################################]
+    ----------------------------------------
+    | # LSBs | Encode Rate  | Decode rate  |
+    | 1      | 30.5   MB/s  | 46.8   MB/s  |
+    | 2      | 40.5   MB/s  | 41.5   MB/s  |
+    | 3      | 58.5   MB/s  | 60.7   MB/s  |
+    | 4      | 75.6   MB/s  | 80.0   MB/s  |
+    | 5      | 91.1   MB/s  | 97.9   MB/s  |
+    | 6      | 106.0  MB/s  | 114.9  MB/s  |
+    | 7      | 119.7  MB/s  | 132.6  MB/s  |
+    | 8      | 223.3  MB/s  | 652.6  MB/s  |
+    ----------------------------------------
 
 <a name = "WavSteg"></a>
 ## WavSteg
