@@ -24,30 +24,23 @@ import getopt
 import os
 from PIL import Image
 import sys
-import timeit
+from time import time
 
 
 def show_lsb(image_path, n):
     """Shows the n least significant bits of image"""
-    start = timeit.default_timer()
-
+    start = time()
     image = Image.open(image_path)
 
     # Used to set everything but the least significant n bits to 0 when
     # using bitwise AND on an integer
     mask = ((1 << n) - 1)
 
-    color_data = list(image.getdata())
-    for i in range(len(color_data)):
-        rgb = list(color_data[i])
-        for j in range(3):
-            rgb[j] &= mask
-        combined_lsb = sum(rgb[:3]) * 255 // (3 * mask)
-        color_data[i] = (combined_lsb, combined_lsb, combined_lsb)
+    color_data = [(255 * ((rgb[0] & mask) + (rgb[1] & mask) + (rgb[2] & mask))
+                   // (3 * mask),) * 3 for rgb in image.getdata()]
 
     image.putdata(color_data)
-    stop = timeit.default_timer()
-    print("Runtime: {0:.2f} s".format(stop - start))
+    print("Runtime: {0:.2f} s".format(time() - start))
     file_name, file_extension = os.path.splitext(image_path)
     image.save(file_name + "_{}LSBs".format(n) + file_extension)
 

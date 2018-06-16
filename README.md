@@ -183,4 +183,4 @@ show, the following command will save the resulting image, appending "_nLSBs"
 to the file name, and will produce output similar to the following:
 
     $ StegDetect.py -f image.png -n 2
-    Runtime: 3.55 s
+    Runtime: 1.01 s
