@@ -148,18 +148,18 @@ The following command will hide data in the input image and write the result to
 the steganographed image, producing output similar to
 
     $ LSBSteg.py -h -i input_image.png -f input_file.zip -o steg.png -n 2 -c 1
-    Reading files...              Done in 0.36 s
-    Hiding 1566763 bytes...       Done in 0.37 s
-    Writing to output image...    Done in 0.61 s
+    Reading files...                   Done in 0.36 s
+    Hiding 1566763 bytes...            Done in 0.37 s
+    Writing to output image...         Done in 0.61 s
 
 ### Recovering Data
 The following command will recover data from the steganographed image and write
 the result to the output file, producing output similar to
 
     $ LSBSteg.py -r -i steg.png -o output_file.zip -n 2
-    Reading files...              Done in 0.40 s
-    Recovering 1566763 bytes      Done in 0.33 s
-    Writing to output file...     Done in 0.00 s
+    Reading files...                   Done in 0.40 s
+    Recovering 1566763 bytes...        Done in 0.33 s
+    Writing to output file...          Done in 0.00 s
 
 <a name = "StegDetect"></a>
 ## StegDetect

@@ -63,7 +63,7 @@ def bytes_in_max_file_size(image, num_lsb):
 def hide_data(input_image_path, input_file_path, steg_image_path, num_lsb,
               compression_level):
     """Hides the data from the input file in the input image."""
-    print("Reading files...".ljust(30), end='', flush=True)
+    print("Reading files...".ljust(35), end='', flush=True)
     start = time()
     image, input_file = prepare_hide(input_image_path, input_file_path)
     num_channels = len(image.getdata()[0])
@@ -81,13 +81,13 @@ def hide_data(input_image_path, input_file_path, steg_image_path, num_lsb,
         print("Only able to hide", max_bits_to_hide(image, num_lsb) // 8,
               "B in image. PROCESS WILL FAIL!")
 
-    print("Hiding {} bytes...".format(file_size).ljust(30), end='', flush=True)
+    print("Hiding {} bytes...".format(file_size).ljust(35), end='', flush=True)
     start = time()
     flattened_color_data = lsb_interleave_list(flattened_color_data, data,
                                                num_lsb)
     print("Done in {:.2f} s".format(time() - start))
 
-    print("Writing to output image...".ljust(30), end='', flush=True)
+    print("Writing to output image...".ljust(35), end='', flush=True)
     start = time()
     # PIL expects a sequence of tuples, one per pixel
     image.putdata(list(zip(*[iter(flattened_color_data)] * num_channels)))
@@ -97,7 +97,7 @@ def hide_data(input_image_path, input_file_path, steg_image_path, num_lsb,
 
 def recover_data(steg_image_path, output_file_path, num_lsb):
     """Writes the data from the steganographed image to the output file"""
-    print("Reading files...".ljust(30), end='', flush=True)
+    print("Reading files...".ljust(35), end='', flush=True)
     start = time()
     steg_image, output_file = prepare_recover(steg_image_path,
                                               output_file_path)
@@ -113,14 +113,14 @@ def recover_data(steg_image_path, output_file_path, num_lsb):
         byteorder=sys.byteorder)
     print("Done in {:.2f} s".format(time() - start))
 
-    print("Recovering {} bytes".format(bytes_to_recover).ljust(30),
+    print("Recovering {} bytes...".format(bytes_to_recover).ljust(35),
           end='', flush=True)
     start = time()
     data = lsb_deinterleave_list(color_data[tag_bit_height:],
                                  8 * bytes_to_recover, num_lsb)
     print("Done in {:.2f} s".format(time() - start))
 
-    print("Writing to output file...".ljust(30), end='', flush=True)
+    print("Writing to output file...".ljust(35), end='', flush=True)
     start = time()
     output_file.write(data)
     output_file.close()
