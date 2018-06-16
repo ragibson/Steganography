@@ -20,36 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from bit_manipulation import lsb_interleave_list, lsb_deinterleave_list
+from bit_manipulation import roundup
 import getopt
-import math
 import os
 from PIL import Image
-import struct
 import sys
-import timeit
-
-
-class Buffer:
-    def __init__(self):
-        self.buffer = 0
-        self.length = 0
-
-    def __len__(self):
-        return self.length
-
-    def read_bits(self, n):
-        """Removes the first n bits from the buffer and returns them."""
-        bits = self.buffer % (1 << n)
-        self.buffer >>= n
-        self.length -= min(n, self.length)
-        return bits
-
-    def __iadd__(self, other):
-        self.buffer += other
-        return self
-
-    def add_length(self, length):
-        self.length += length
+from time import time
 
 
 def prepare_hide(input_image_path, input_file_path):
@@ -66,13 +43,6 @@ def prepare_recover(steg_image_path, output_file_path):
     return steg_image, output_file
 
 
-def and_mask(index, n):
-    """Returns an int used to set n bits to 0 from the indexth bit when using
-    bitwise AND on an integer of 8 bits or less.
-    Ex: and_mask(3,2) --> 0b11100111 = 231."""
-    return 255 - ((1 << n) - 1 << index)
-
-
 def get_filesize(path):
     """Returns the file size in bytes of the file at path"""
     return os.stat(path).st_size
@@ -85,110 +55,76 @@ def max_bits_to_hide(image, num_lsb):
     return int(3 * image.size[0] * image.size[1] * num_lsb)
 
 
-def bits_in_max_file_size(image, num_lsb):
+def bytes_in_max_file_size(image, num_lsb):
     """Returns the number of bits needed to store the size of the file."""
-    return max_bits_to_hide(image, num_lsb).bit_length()
+    return roundup(max_bits_to_hide(image, num_lsb).bit_length() / 8)
 
 
 def hide_data(input_image_path, input_file_path, steg_image_path, num_lsb,
               compression_level):
     """Hides the data from the input file in the input image."""
-    start = timeit.default_timer()
+    print("Reading files...".ljust(30), end='', flush=True)
+    start = time()
     image, input_file = prepare_hide(input_image_path, input_file_path)
-    buffer = Buffer()
+    num_channels = len(image.getdata()[0])
+    flattened_color_data = [v for t in image.getdata() for v in t]
 
-    data = iter(memoryview(input_file.read()))
+    # We add the size of the input file to the beginning of the payload.
+    file_size = get_filesize(input_file_path)
+    file_size_tag = file_size.to_bytes(bytes_in_max_file_size(image, num_lsb),
+                                       byteorder=sys.byteorder)
 
-    color_data = list(image.getdata())
-    color_data_index = 0
+    data = file_size_tag + input_file.read()
+    print("Done in {:.2f} s".format(time() - start))
 
-    # We add the size of the input file to the beginning of the buffer.
-    input_file_size = get_filesize(input_file_path)
-    buffer += input_file_size
-    buffer.add_length(bits_in_max_file_size(image, num_lsb))
-
-    print("Hiding", input_file_size, "bytes")
-
-    if input_file_size * 8 + len(buffer) > max_bits_to_hide(image, num_lsb):
+    if 8 * len(data) > max_bits_to_hide(image, num_lsb):
         print("Only able to hide", max_bits_to_hide(image, num_lsb) // 8,
               "B in image. PROCESS WILL FAIL!")
-    mask = and_mask(0, num_lsb)
 
-    done = False
-    while not done:
-        rgb = list(color_data[color_data_index])
-        for i in range(3):
-            if len(buffer) < num_lsb:
-                # If we need more data in the buffer, add a byte from the
-                # file to it.
-                try:
-                    buffer += next(data) << len(buffer)
-                    buffer.add_length(8)
-                except StopIteration:
-                    # If we've reached the end of our data, we're done
-                    done = True
-            # Replace the num_lsb least significant bits of each color
-            # channel with the first num_lsb bits from the buffer.
-            rgb[i] &= mask
-            rgb[i] |= buffer.read_bits(num_lsb)
-        color_data[color_data_index] = tuple(rgb)
-        color_data_index += 1
+    print("Hiding {} bytes...".format(file_size).ljust(30), end='', flush=True)
+    start = time()
+    flattened_color_data = lsb_interleave_list(flattened_color_data, data,
+                                               num_lsb)
+    print("Done in {:.2f} s".format(time() - start))
 
-    image.putdata(color_data)
+    print("Writing to output image...".ljust(30), end='', flush=True)
+    start = time()
+    # PIL expects a sequence of tuples, one per pixel
+    image.putdata(list(zip(*[iter(flattened_color_data)] * num_channels)))
     image.save(steg_image_path, compress_level=compression_level)
-    stop = timeit.default_timer()
-    print("Runtime: {0:.2f} s".format(stop - start))
+    print("Done in {:.2f} s".format(time() - start))
 
 
 def recover_data(steg_image_path, output_file_path, num_lsb):
     """Writes the data from the steganographed image to the output file"""
-    start = timeit.default_timer()
+    print("Reading files...".ljust(30), end='', flush=True)
+    start = time()
     steg_image, output_file = prepare_recover(steg_image_path,
                                               output_file_path)
-    buffer = Buffer()
 
-    data = bytearray()
+    color_data = [v for t in steg_image.getdata() for v in t]
 
-    color_data = list(steg_image.getdata())
-    color_data_index = 0
+    file_size_tag_size = bytes_in_max_file_size(steg_image, num_lsb)
+    tag_bit_height = roundup(8 * file_size_tag_size / num_lsb)
 
-    pixels_used_for_file_size = int(
-        math.ceil(bits_in_max_file_size(steg_image, num_lsb) / (3 * num_lsb)))
-    for i in range(pixels_used_for_file_size):
-        rgb = list(color_data[color_data_index])
-        color_data_index += 1
-        for j in range(3):
-            # Add the num_lsb least significant bits
-            # of each color channel to the buffer.
-            buffer += (rgb[j] % (1 << num_lsb) << len(buffer))
-            buffer.add_length(num_lsb)
+    bytes_to_recover = int.from_bytes(
+        lsb_deinterleave_list(color_data[:tag_bit_height],
+                              8 * file_size_tag_size, num_lsb),
+        byteorder=sys.byteorder)
+    print("Done in {:.2f} s".format(time() - start))
 
-    # Get the size of the file we need to recover.
-    bytes_to_recover = buffer.read_bits(
-        bits_in_max_file_size(steg_image, num_lsb))
-    print("Looking to recover", bytes_to_recover, "bytes")
+    print("Recovering {} bytes".format(bytes_to_recover).ljust(30),
+          end='', flush=True)
+    start = time()
+    data = lsb_deinterleave_list(color_data[tag_bit_height:],
+                                 8 * bytes_to_recover, num_lsb)
+    print("Done in {:.2f} s".format(time() - start))
 
-    while bytes_to_recover > 0:
-        rgb = list(color_data[color_data_index])
-        color_data_index += 1
-        for i in range(3):
-            # Add the num_lsb least significant bits
-            # of each color channel to the buffer.
-            buffer += (rgb[i] % (1 << num_lsb)) << len(buffer)
-            buffer.add_length(num_lsb)
-
-        while len(buffer) >= 8 and bytes_to_recover > 0:
-            # If we have more than a byte in the buffer, add it to data
-            # and decrement the number of bytes left to recover.
-            bits = buffer.read_bits(8)
-            data += struct.pack('1B', bits)
-            bytes_to_recover -= 1
-
-    output_file.write(bytes(data))
+    print("Writing to output file...".ljust(30), end='', flush=True)
+    start = time()
+    output_file.write(data)
     output_file.close()
-
-    stop = timeit.default_timer()
-    print("Runtime: {0:.2f} s".format(stop - start))
+    print("Done in {:.2f} s".format(time() - start))
 
 
 def analysis(image_file_path, input_file_path, num_lsb):
@@ -201,7 +137,7 @@ def analysis(image_file_path, input_file_path, num_lsb):
           "".format(image.size[0], image.size[1], num_lsb,
                     max_bits_to_hide(image, num_lsb) // 8,
                     get_filesize(input_file_path),
-                    math.ceil(bits_in_max_file_size(image, num_lsb) / 8)))
+                    bytes_in_max_file_size(image, num_lsb)))
 
 
 def usage():
