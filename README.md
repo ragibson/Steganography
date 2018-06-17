@@ -75,15 +75,15 @@ Hiding data requires the arguments -h, -s, -f, -o, and -n.
 
 The following command would hide the contents of file.txt into sound.wav and
 save the result as sound_steg.wav. The command also outputs how many bytes have
-been used out of a theoretical maximum. In practice, the maximum amount of data
-we can hide may be slightly lower than what is displayed because we skip
-samples that have the smallest possible value (for most files, this never
-occurs).
+been used out of a theoretical maximum.
 
 Example:
 
-    $ WavSteg.py -h -s sound.wav -f file.txt -o sound_steg.wav -n 1
-	Using 1000 B out of 2000 B
+    $ WavSteg.py -h -s sound.wav -f file.txt -o sound_steg.wav -n 2
+    Using 2 LSBs, we can hide 6551441 B
+    Reading files...                   Done in 0.02 s
+    Hiding 5589889 bytes...            Done in 0.34 s
+    Writing to output wav...           Done in 0.06 s
 	
 If you attempt to hide too much data, WavSteg will raise a ValueError and
 print the minimum number of LSBs required to hide your data.
@@ -97,7 +97,10 @@ be accurate or the result may be too short or contain extraneous data.
 
 Example:
 
-    $ WavSteg.py -r -s sound_steg.wav -o output.txt -n 1 -b 1000
+    $ WavSteg.py -r -s sound_steg.wav -o output.txt -n 2 -b 5589889
+    Reading files...                   Done in 0.02 s
+    Recovering 5589889 bytes...        Done in 0.26 s
+    Writing to output file...          Done in 0.00 s
   
 <a name = "LSBSteg"></a>
 ## LSBSteg
