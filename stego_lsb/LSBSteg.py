@@ -1,26 +1,14 @@
-# The MIT License (MIT)
-#
-# Copyright (c) 2015 Ryan Gibson
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# -*- coding: utf-8 -*-
+"""
+    stego_lsb.LSBSteg
+    ~~~~~~~~~~~~~~~~~
 
-import getopt
+    This module contains functions for hiding and recovering
+    data from bitmap (.bmp and .png) files.
+
+    :copyright: (c) 2015 by Ryan Gibson, see AUTHORS.md for more details.
+    :license: MIT License, see LICENSE.md for more details.
+"""
 import logging
 import os
 import sys
@@ -153,96 +141,3 @@ def analysis(image_file_path, input_file_path, num_lsb):
             bytes_in_max_file_size(image, num_lsb),
         )
     )
-
-
-def usage():
-    print(
-        "\nCommand Line Arguments:\n",
-        "-h, --hide           To hide data in an image\n",
-        "-r, --recover        To recover data from an image\n",
-        "-a, --analyze        Print how much data can be hidden in image\n",
-        "-i, --image=         Path to a bitmap (.bmp or .png) image\n",
-        "-f, --file=          Path to a file to hide in the image\n",
-        "-o, --output=        Path to an output file\n",
-        "-n, --LSBs=          How many LSBs to use\n",
-        "-c, --compression=   1 (best speed) to 9 (smallest file size)\n",
-        "--help               Display this message\n",
-    )
-
-
-if __name__ == "__main__":
-    try:
-        opts, args = getopt.getopt(
-            sys.argv[1:],
-            "hrai:f:o:n:c:",
-            [
-                "hide",
-                "recover",
-                "analyze",
-                "image=",
-                "file=",
-                "output=",
-                "LSBs=",
-                "compression=",
-                "help",
-            ],
-        )
-    except getopt.GetoptError:
-        usage()
-        sys.exit(1)
-
-    # enable logging
-    logging.basicConfig(format="%(message)s", level=logging.INFO)
-    log.setLevel(logging.DEBUG)
-
-    hiding_data = False
-    recovering_data = False
-    analyze = False
-
-    # file paths for input, image, and output files
-    image_fp = ""
-    input_fp = ""
-    output_fp = ""
-
-    # number of least significant bits to alter when hiding/recovering data
-    num_bits = 2
-
-    # compression level ranging from 1 (best speed) to 9 (smallest file size)
-    compression = 1
-
-    for opt, arg in opts:
-        if opt in ("-h", "--hide"):
-            hiding_data = True
-        elif opt in ("-r", "--recover"):
-            recovering_data = True
-        elif opt in ("-a", "--analyze"):
-            analyze = True
-        elif opt in ("-i", "--image"):
-            image_fp = arg
-        elif opt in ("-f", "--file"):
-            input_fp = arg
-        elif opt in ("-o", "--output"):
-            output_fp = arg
-        elif opt in ("-n", "--LSBs="):
-            num_bits = int(arg)
-        elif opt in ("-c", "--compression="):
-            compression = int(arg)
-        elif opt == "--help":
-            usage()
-            sys.exit(1)
-        else:
-            log.debug("Invalid argument {}".format(opt))
-
-    try:
-        if analyze:
-            analysis(image_fp, input_fp, num_bits)
-        if hiding_data:
-            hide_data(image_fp, input_fp, output_fp, num_bits, compression)
-        if recovering_data:
-            recover_data(image_fp, output_fp, num_bits)
-    except Exception as e:
-        log.error(
-            "Ran into an error during execution. Check input and try again.")
-        log.exception(e)
-        usage()
-        sys.exit(1)

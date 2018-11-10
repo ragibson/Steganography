@@ -5,12 +5,28 @@ from setuptools import find_packages, setup
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-requirements = ["Pillow>=5.3.0", "numpy>=1.15.4"]
+requirements = ["Pillow>=5.3.0", "numpy>=1.15.4", "Click>=7.0"]
 
 
 setup(
     author="Ryan Gibson",
     author_email="ryanalexandergibson@gmail.com",
+    name="stego_lsb",
+    version="0.1.0",
+    description="stego lsb",
+    keywords="stego lsb",
+    license="MIT",
+    long_description=readme,
+    long_description_content_type="text/markdown",
+    url="https://git.someblocks.com/sh4nks/stego_lsb.git",
+    install_requires=requirements,
+    entry_points="""
+        [console_scripts]
+        stegolsb=stego_lsb.cli:main
+    """,
+    include_package_data=True,
+    packages=find_packages(include=["stego_lsb"]),
+    zip_safe=False,
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
@@ -22,16 +38,4 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
     ],
-    description="stego lsb",
-    install_requires=requirements,
-    license="MIT",
-    long_description=readme,
-    long_description_content_type="text/markdown",
-    include_package_data=True,
-    keywords="stego lsb",
-    name="stego_lsb",
-    packages=find_packages(include=["stego_lsb"]),
-    url="https://git.someblocks.com/sh4nks/stego_lsb.git",
-    version="0.1.0",
-    zip_safe=False,
 )

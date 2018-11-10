@@ -1,30 +1,17 @@
-# The MIT License (MIT)
-#
-# Copyright (c) 2015 Ryan Gibson
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# -*- coding: utf-8 -*-
+"""
+    stego_lsb.WavSteg
+    ~~~~~~~~~~~~~~~~~
 
-import getopt
+    This module contains functions for hiding and retrieving
+    data from .wav files.
+
+    :copyright: (c) 2015 by Ryan Gibson, see AUTHORS.md for more details.
+    :license: MIT License, see LICENSE.md for more details.
+"""
 import logging
 import math
 import os
-import sys
 import wave
 from time import time
 
@@ -106,90 +93,3 @@ def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
     output_file.write(bytes(data))
     output_file.close()
     log.debug(f"Written output file \tin {time() - start:.2f}s")
-
-
-def usage():
-    print(
-        "\nCommand Line Arguments:\n",
-        "-h, --hide        To hide data in a sound file\n",
-        "-r, --recover     To recover data from a sound file\n",
-        "-s, --sound=      Path to a .wav file\n",
-        "-f, --file=       Path to a file to hide in the sound file\n",
-        "-o, --output=     Path to an output file\n",
-        "-n, --LSBs=       How many LSBs to use\n",
-        "-b, --bytes=      How many bytes to recover from the sound file\n",
-        "--help            Display this message\n",
-    )
-
-
-if __name__ == "__main__":
-    try:
-        opts, args = getopt.getopt(
-            sys.argv[1:],
-            "hrs:f:o:n:b:",
-            [
-                "hide",
-                "recover",
-                "sound=",
-                "file=",
-                "output=",
-                "LSBs=",
-                "bytes=",
-                "help",
-            ],
-        )
-    except getopt.GetoptError:
-        usage()
-        sys.exit(1)
-
-    # enable logging
-    logging.basicConfig(format="%(message)s", level=logging.INFO)
-    log.setLevel(logging.DEBUG)
-
-    hiding_data = False
-    recovering_data = False
-    num_bytes_to_recover = 0
-
-    # file paths for input, sound, and output files
-    sound_fp = ""
-    input_fp = ""
-    output_fp = ""
-
-    # number of least significant bits to alter when hiding/recovering data
-    num_bits = 2
-
-    for opt, arg in opts:
-        if opt in ("-h", "--hide"):
-            hiding_data = True
-        elif opt in ("-r", "--recover"):
-            recovering_data = True
-        elif opt in ("-s", "--sound"):
-            sound_fp = arg
-        elif opt in ("-f", "--file"):
-            input_fp = arg
-        elif opt in ("-o", "--output"):
-            output_fp = arg
-        elif opt in ("-n", "--LSBs="):
-            num_bits = int(arg)
-        elif opt in ("-b", "--bytes="):
-            num_bytes_to_recover = int(arg)
-        elif opt == "--help":
-            usage()
-            sys.exit(1)
-        else:
-            log.error(f"Invalid argument {opt}")
-
-    try:
-        log.debug(f"Sound file: {sound_fp}")
-        log.debug(f"Input file: {input_fp}")
-        if hiding_data:
-            hide_data(sound_fp, input_fp, output_fp, num_bits)
-        if recovering_data:
-            recover_data(sound_fp, output_fp, num_bits, num_bytes_to_recover)
-    except Exception as e:
-        log.error(
-            "Ran into an error during execution. Check input and try again."
-        )
-        log.exception(e)
-        usage()
-        sys.exit(1)
