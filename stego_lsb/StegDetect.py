@@ -1,17 +1,17 @@
 # The MIT License (MIT)
-# 
+#
 # Copyright (c) 2015 Ryan Gibson
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,9 +22,10 @@
 
 import getopt
 import os
-from PIL import Image
 import sys
 from time import time
+
+from PIL import Image
 
 
 def show_lsb(image_path, n):
@@ -34,10 +35,17 @@ def show_lsb(image_path, n):
 
     # Used to set everything but the least significant n bits to 0 when
     # using bitwise AND on an integer
-    mask = ((1 << n) - 1)
+    mask = (1 << n) - 1
 
-    color_data = [(255 * ((rgb[0] & mask) + (rgb[1] & mask) + (rgb[2] & mask))
-                   // (3 * mask),) * 3 for rgb in image.getdata()]
+    color_data = [
+        (
+            255
+            * ((rgb[0] & mask) + (rgb[1] & mask) + (rgb[2] & mask))
+            // (3 * mask),
+        )
+        * 3
+        for rgb in image.getdata()
+    ]
 
     image.putdata(color_data)
     print("Runtime: {0:.2f} s".format(time() - start))
@@ -46,16 +54,19 @@ def show_lsb(image_path, n):
 
 
 def usage():
-    print("\nCommand Line Arguments:\n",
-          "-f, --file=       Path to an image\n",
-          "-n, --LSBs=       How many LSBs to display\n",
-          "--help            Display this message\n")
+    print(
+        "\nCommand Line Arguments:\n",
+        "-f, --file=       Path to an image\n",
+        "-n, --LSBs=       How many LSBs to display\n",
+        "--help            Display this message\n",
+    )
 
 
 if __name__ == "__main__":
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'f:n:',
-                                   ['file=', 'LSBs=', 'help'])
+        opts, args = getopt.getopt(
+            sys.argv[1:], "f:n:", ["file=", "LSBs=", "help"]
+        )
     except getopt.GetoptError:
         usage()
         sys.exit(1)
@@ -80,8 +91,10 @@ if __name__ == "__main__":
     try:
         show_lsb(input_fp, num_bits)
     except Exception as e:
-        print("Ran into an error during execution.\n",
-              "Check input and try again.\n")
+        print(
+            "Ran into an error during execution.\n",
+            "Check input and try again.\n",
+        )
         print(e)
         usage()
         sys.exit(1)

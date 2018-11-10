@@ -1,17 +1,17 @@
 # The MIT License (MIT)
-# 
+#
 # Copyright (c) 2015 Ryan Gibson
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -20,13 +20,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from bit_manipulation import lsb_interleave_bytes, lsb_deinterleave_bytes
 import getopt
 import math
 import os
 import sys
-from time import time
 import wave
+from time import time
+
+from stego_lsb.bit_manipulation import (lsb_deinterleave_bytes,
+                                        lsb_interleave_bytes)
 
 
 def hide_data(sound_path, file_path, output_path, num_lsb):
@@ -45,7 +47,7 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
 
     print("Using {} LSBs, we can hide {} B".format(num_lsb, max_bytes_to_hide))
 
-    print("Reading files...".ljust(35), end='', flush=True)
+    print("Reading files...".ljust(35), end="", flush=True)
     start = time()
     sound_frames = sound.readframes(num_frames)
     data = open(file_path, "rb").read()
@@ -53,21 +55,23 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
 
     if file_size > max_bytes_to_hide:
         required_lsb = math.ceil(file_size * 8 / num_samples)
-        raise ValueError("Input file too large to hide, "
-                         "requires {} LSBs, using {}"
-                         .format(required_lsb, num_lsb))
+        raise ValueError(
+            "Input file too large to hide, "
+            "requires {} LSBs, using {}".format(required_lsb, num_lsb)
+        )
 
     if sample_width != 1 and sample_width != 2:
         # Python's wave module doesn't support higher sample widths
         raise ValueError("File has an unsupported bit-depth")
 
-    print("Hiding {} bytes...".format(file_size).ljust(35), end='', flush=True)
+    print("Hiding {} bytes...".format(file_size).ljust(35), end="", flush=True)
     start = time()
-    sound_frames = lsb_interleave_bytes(sound_frames, data, num_lsb,
-                                        byte_depth=sample_width)
+    sound_frames = lsb_interleave_bytes(
+        sound_frames, data, num_lsb, byte_depth=sample_width
+    )
     print("Done in {:.2f} s".format(time() - start))
 
-    print("Writing to output wav...".ljust(35), end='', flush=True)
+    print("Writing to output wav...".ljust(35), end="", flush=True)
     start = time()
     sound_steg = wave.open(output_path, "w")
     sound_steg.setparams(params)
@@ -78,7 +82,7 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
 
 def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
     """Recover data from the file at sound_path to the file at output_path"""
-    print("Reading files...".ljust(35), end='', flush=True)
+    print("Reading files...".ljust(35), end="", flush=True)
     start = time()
     sound = wave.open(sound_path, "r")
 
@@ -92,14 +96,18 @@ def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
         # Python's wave module doesn't support higher sample widths
         raise ValueError("File has an unsupported bit-depth")
 
-    print("Recovering {} bytes...".format(bytes_to_recover).ljust(35),
-          end='', flush=True)
+    print(
+        "Recovering {} bytes...".format(bytes_to_recover).ljust(35),
+        end="",
+        flush=True,
+    )
     start = time()
-    data = lsb_deinterleave_bytes(sound_frames, 8 * bytes_to_recover, num_lsb,
-                                  byte_depth=sample_width)
+    data = lsb_deinterleave_bytes(
+        sound_frames, 8 * bytes_to_recover, num_lsb, byte_depth=sample_width
+    )
     print("Done in {:.2f} s".format(time() - start))
 
-    print("Writing to output file...".ljust(35), end='', flush=True)
+    print("Writing to output file...".ljust(35), end="", flush=True)
     start = time()
     output_file = open(output_path, "wb+")
     output_file.write(bytes(data))
@@ -108,22 +116,35 @@ def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
 
 
 def usage():
-    print("\nCommand Line Arguments:\n",
-          "-h, --hide        To hide data in a sound file\n",
-          "-r, --recover     To recover data from a sound file\n",
-          "-s, --sound=      Path to a .wav file\n",
-          "-f, --file=       Path to a file to hide in the sound file\n",
-          "-o, --output=     Path to an output file\n",
-          "-n, --LSBs=       How many LSBs to use\n",
-          "-b, --bytes=      How many bytes to recover from the sound file\n",
-          "--help            Display this message\n")
+    print(
+        "\nCommand Line Arguments:\n",
+        "-h, --hide        To hide data in a sound file\n",
+        "-r, --recover     To recover data from a sound file\n",
+        "-s, --sound=      Path to a .wav file\n",
+        "-f, --file=       Path to a file to hide in the sound file\n",
+        "-o, --output=     Path to an output file\n",
+        "-n, --LSBs=       How many LSBs to use\n",
+        "-b, --bytes=      How many bytes to recover from the sound file\n",
+        "--help            Display this message\n",
+    )
 
 
 if __name__ == "__main__":
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hrs:f:o:n:b:',
-                                   ['hide', 'recover', 'sound=', 'file=',
-                                    'output=', 'LSBs=', 'bytes=', 'help'])
+        opts, args = getopt.getopt(
+            sys.argv[1:],
+            "hrs:f:o:n:b:",
+            [
+                "hide",
+                "recover",
+                "sound=",
+                "file=",
+                "output=",
+                "LSBs=",
+                "bytes=",
+                "help",
+            ],
+        )
     except getopt.GetoptError:
         usage()
         sys.exit(1)
@@ -167,8 +188,10 @@ if __name__ == "__main__":
         if recovering_data:
             recover_data(sound_fp, output_fp, num_bits, num_bytes_to_recover)
     except Exception as e:
-        print("Ran into an error during execution.\n",
-              "Check input and try again.\n")
+        print(
+            "Ran into an error during execution.\n",
+            "Check input and try again.\n",
+        )
         print(e)
         usage()
         sys.exit(1)

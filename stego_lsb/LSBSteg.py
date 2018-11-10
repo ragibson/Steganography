@@ -1,14 +1,14 @@
 # The MIT License (MIT)
-# 
+#
 # Copyright (c) 2015 Ryan Gibson
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
 #
@@ -20,13 +20,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from bit_manipulation import lsb_interleave_list, lsb_deinterleave_list
-from bit_manipulation import roundup
 import getopt
 import os
-from PIL import Image
 import sys
 from time import time
+
+from PIL import Image
+
+from stego_lsb.bit_manipulation import (lsb_deinterleave_list,
+                                        lsb_interleave_list, roundup)
 
 
 def prepare_hide(input_image_path, input_file_path):
@@ -60,10 +62,15 @@ def bytes_in_max_file_size(image, num_lsb):
     return roundup(max_bits_to_hide(image, num_lsb).bit_length() / 8)
 
 
-def hide_data(input_image_path, input_file_path, steg_image_path, num_lsb,
-              compression_level):
+def hide_data(
+    input_image_path,
+    input_file_path,
+    steg_image_path,
+    num_lsb,
+    compression_level,
+):
     """Hides the data from the input file in the input image."""
-    print("Reading files...".ljust(35), end='', flush=True)
+    print("Reading files...".ljust(35), end="", flush=True)
     start = time()
     image, input_file = prepare_hide(input_image_path, input_file_path)
     num_channels = len(image.getdata()[0])
@@ -71,23 +78,28 @@ def hide_data(input_image_path, input_file_path, steg_image_path, num_lsb,
 
     # We add the size of the input file to the beginning of the payload.
     file_size = get_filesize(input_file_path)
-    file_size_tag = file_size.to_bytes(bytes_in_max_file_size(image, num_lsb),
-                                       byteorder=sys.byteorder)
+    file_size_tag = file_size.to_bytes(
+        bytes_in_max_file_size(image, num_lsb), byteorder=sys.byteorder
+    )
 
     data = file_size_tag + input_file.read()
     print("Done in {:.2f} s".format(time() - start))
 
     if 8 * len(data) > max_bits_to_hide(image, num_lsb):
-        print("Only able to hide", max_bits_to_hide(image, num_lsb) // 8,
-              "B in image. PROCESS WILL FAIL!")
+        print(
+            "Only able to hide",
+            max_bits_to_hide(image, num_lsb) // 8,
+            "B in image. PROCESS WILL FAIL!",
+        )
 
-    print("Hiding {} bytes...".format(file_size).ljust(35), end='', flush=True)
+    print("Hiding {} bytes...".format(file_size).ljust(35), end="", flush=True)
     start = time()
-    flattened_color_data = lsb_interleave_list(flattened_color_data, data,
-                                               num_lsb)
+    flattened_color_data = lsb_interleave_list(
+        flattened_color_data, data, num_lsb
+    )
     print("Done in {:.2f} s".format(time() - start))
 
-    print("Writing to output image...".ljust(35), end='', flush=True)
+    print("Writing to output image...".ljust(35), end="", flush=True)
     start = time()
     # PIL expects a sequence of tuples, one per pixel
     image.putdata(list(zip(*[iter(flattened_color_data)] * num_channels)))
@@ -97,10 +109,9 @@ def hide_data(input_image_path, input_file_path, steg_image_path, num_lsb,
 
 def recover_data(steg_image_path, output_file_path, num_lsb):
     """Writes the data from the steganographed image to the output file"""
-    print("Reading files...".ljust(35), end='', flush=True)
+    print("Reading files...".ljust(35), end="", flush=True)
     start = time()
-    steg_image, output_file = prepare_recover(steg_image_path,
-                                              output_file_path)
+    steg_image, output_file = prepare_recover(steg_image_path, output_file_path)
 
     color_data = [v for t in steg_image.getdata() for v in t]
 
@@ -108,19 +119,25 @@ def recover_data(steg_image_path, output_file_path, num_lsb):
     tag_bit_height = roundup(8 * file_size_tag_size / num_lsb)
 
     bytes_to_recover = int.from_bytes(
-        lsb_deinterleave_list(color_data[:tag_bit_height],
-                              8 * file_size_tag_size, num_lsb),
-        byteorder=sys.byteorder)
+        lsb_deinterleave_list(
+            color_data[:tag_bit_height], 8 * file_size_tag_size, num_lsb
+        ),
+        byteorder=sys.byteorder,
+    )
     print("Done in {:.2f} s".format(time() - start))
 
-    print("Recovering {} bytes...".format(bytes_to_recover).ljust(35),
-          end='', flush=True)
+    print(
+        "Recovering {} bytes...".format(bytes_to_recover).ljust(35),
+        end="",
+        flush=True,
+    )
     start = time()
-    data = lsb_deinterleave_list(color_data[tag_bit_height:],
-                                 8 * bytes_to_recover, num_lsb)
+    data = lsb_deinterleave_list(
+        color_data[tag_bit_height:], 8 * bytes_to_recover, num_lsb
+    )
     print("Done in {:.2f} s".format(time() - start))
 
-    print("Writing to output file...".ljust(35), end='', flush=True)
+    print("Writing to output file...".ljust(35), end="", flush=True)
     start = time()
     output_file.write(data)
     output_file.close()
@@ -130,35 +147,54 @@ def recover_data(steg_image_path, output_file_path, num_lsb):
 def analysis(image_file_path, input_file_path, num_lsb):
     """Print how much data we can hide and the size of the data to be hidden"""
     image = Image.open(image_file_path)
-    print("Image resolution: ({}, {})\n"
-          "Using {} LSBs, we can hide:\t{} B\n"
-          "Size of input file:\t\t{} B\n"
-          "File size tag:\t\t\t{} B"
-          "".format(image.size[0], image.size[1], num_lsb,
-                    max_bits_to_hide(image, num_lsb) // 8,
-                    get_filesize(input_file_path),
-                    bytes_in_max_file_size(image, num_lsb)))
+    print(
+        "Image resolution: ({}, {})\n"
+        "Using {} LSBs, we can hide:\t{} B\n"
+        "Size of input file:\t\t{} B\n"
+        "File size tag:\t\t\t{} B"
+        "".format(
+            image.size[0],
+            image.size[1],
+            num_lsb,
+            max_bits_to_hide(image, num_lsb) // 8,
+            get_filesize(input_file_path),
+            bytes_in_max_file_size(image, num_lsb),
+        )
+    )
 
 
 def usage():
-    print("\nCommand Line Arguments:\n",
-          "-h, --hide           To hide data in an image\n",
-          "-r, --recover        To recover data from an image\n",
-          "-a, --analyze        Print how much data can be hidden in image\n",
-          "-i, --image=         Path to a bitmap (.bmp or .png) image\n",
-          "-f, --file=          Path to a file to hide in the image\n",
-          "-o, --output=        Path to an output file\n",
-          "-n, --LSBs=          How many LSBs to use\n",
-          "-c, --compression=   1 (best speed) to 9 (smallest file size)\n",
-          "--help               Display this message\n")
+    print(
+        "\nCommand Line Arguments:\n",
+        "-h, --hide           To hide data in an image\n",
+        "-r, --recover        To recover data from an image\n",
+        "-a, --analyze        Print how much data can be hidden in image\n",
+        "-i, --image=         Path to a bitmap (.bmp or .png) image\n",
+        "-f, --file=          Path to a file to hide in the image\n",
+        "-o, --output=        Path to an output file\n",
+        "-n, --LSBs=          How many LSBs to use\n",
+        "-c, --compression=   1 (best speed) to 9 (smallest file size)\n",
+        "--help               Display this message\n",
+    )
 
 
 if __name__ == "__main__":
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hrai:f:o:n:c:',
-                                   ['hide', 'recover', 'analyze', 'image=',
-                                    'file=', 'output=', 'LSBs=',
-                                    'compression=', 'help'])
+        opts, args = getopt.getopt(
+            sys.argv[1:],
+            "hrai:f:o:n:c:",
+            [
+                "hide",
+                "recover",
+                "analyze",
+                "image=",
+                "file=",
+                "output=",
+                "LSBs=",
+                "compression=",
+                "help",
+            ],
+        )
     except getopt.GetoptError:
         usage()
         sys.exit(1)
@@ -209,8 +245,10 @@ if __name__ == "__main__":
         if recovering_data:
             recover_data(image_fp, output_fp, num_bits)
     except Exception as e:
-        print("Ran into an error during execution.\n",
-              "Check input and try again.\n")
+        print(
+            "Ran into an error during execution.\n",
+            "Check input and try again.\n",
+        )
         print(e)
         usage()
         sys.exit(1)
