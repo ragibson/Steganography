@@ -22,6 +22,18 @@ from stego_lsb.bit_manipulation import (lsb_deinterleave_list,
 log = logging.getLogger(__name__)
 
 
+def _str_to_bytes(x, charset=sys.getdefaultencoding(), errors="strict"):
+    if x is None:
+        return None
+    if isinstance(x, (bytes, bytearray, memoryview)):  # noqa
+        return bytes(x)
+    if isinstance(x, str):
+        return x.encode(charset, errors)
+    if isinstance(x, int):
+        return str(x).encode(charset, errors)
+    raise TypeError("Expected bytes")
+
+
 def prepare_hide(input_image_path, input_file_path):
     """Prepare files for reading and writing for hiding data."""
     image = Image.open(input_image_path)
@@ -72,7 +84,7 @@ def hide_message_in_image(input_image, message, num_lsb):
     file_size_tag = message_size.to_bytes(
         bytes_in_max_file_size(image, num_lsb), byteorder=sys.byteorder
     )
-    data = file_size_tag + message
+    data = file_size_tag + _str_to_bytes(message)
     log.debug(f"Files read \t\tin {time() - start:.2f}s")
 
     if 8 * len(data) > max_bits_to_hide(image, num_lsb):
