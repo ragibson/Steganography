@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 import getopt
+import logging
 import os
 import sys
 from time import time
@@ -29,6 +30,8 @@ from PIL import Image
 
 from stego_lsb.bit_manipulation import (lsb_deinterleave_list,
                                         lsb_interleave_list, roundup)
+
+log = logging.getLogger(__name__)
 
 
 def prepare_hide(input_image_path, input_file_path):
@@ -70,7 +73,6 @@ def hide_data(
     compression_level,
 ):
     """Hides the data from the input file in the input image."""
-    print("Reading files...".ljust(35), end="", flush=True)
     start = time()
     image, input_file = prepare_hide(input_image_path, input_file_path)
     num_channels = len(image.getdata()[0])
@@ -83,33 +85,29 @@ def hide_data(
     )
 
     data = file_size_tag + input_file.read()
-    print("Done in {:.2f} s".format(time() - start))
+    log.debug(f"Files read \t\tin {time() - start:.2f}s")
 
     if 8 * len(data) > max_bits_to_hide(image, num_lsb):
-        print(
-            "Only able to hide",
-            max_bits_to_hide(image, num_lsb) // 8,
-            "B in image. PROCESS WILL FAIL!",
+        log.debug(
+            f"Only able to hide {max_bits_to_hide(image, num_lsb) // 8} bytes ",
+            "in image. PROCESS WILL FAIL!",
         )
 
-    print("Hiding {} bytes...".format(file_size).ljust(35), end="", flush=True)
     start = time()
     flattened_color_data = lsb_interleave_list(
         flattened_color_data, data, num_lsb
     )
-    print("Done in {:.2f} s".format(time() - start))
+    log.debug(f"{file_size} bytes hidden \tin {time() - start:.2f}s")
 
-    print("Writing to output image...".ljust(35), end="", flush=True)
     start = time()
     # PIL expects a sequence of tuples, one per pixel
     image.putdata(list(zip(*[iter(flattened_color_data)] * num_channels)))
     image.save(steg_image_path, compress_level=compression_level)
-    print("Done in {:.2f} s".format(time() - start))
+    log.debug(f"Output image written \tin {time() - start:.2f}s")
 
 
 def recover_data(steg_image_path, output_file_path, num_lsb):
     """Writes the data from the steganographed image to the output file"""
-    print("Reading files...".ljust(35), end="", flush=True)
     start = time()
     steg_image, output_file = prepare_recover(steg_image_path, output_file_path)
 
@@ -124,24 +122,18 @@ def recover_data(steg_image_path, output_file_path, num_lsb):
         ),
         byteorder=sys.byteorder,
     )
-    print("Done in {:.2f} s".format(time() - start))
+    log.debug(f"Files read \t\tin {time() - start:.2f}s")
 
-    print(
-        "Recovering {} bytes...".format(bytes_to_recover).ljust(35),
-        end="",
-        flush=True,
-    )
     start = time()
     data = lsb_deinterleave_list(
         color_data[tag_bit_height:], 8 * bytes_to_recover, num_lsb
     )
-    print("Done in {:.2f} s".format(time() - start))
+    log.debug(f"{bytes_to_recover} bytes recovered \tin {time() - start:.2f} s")
 
-    print("Writing to output file...".ljust(35), end="", flush=True)
     start = time()
     output_file.write(data)
     output_file.close()
-    print("Done in {:.2f} s".format(time() - start))
+    log.debug(f"Output file written in {time() - start:.2f}s")
 
 
 def analysis(image_file_path, input_file_path, num_lsb):
@@ -199,6 +191,10 @@ if __name__ == "__main__":
         usage()
         sys.exit(1)
 
+    # enable logging
+    logging.basicConfig(format="%(message)s", level=logging.INFO)
+    log.setLevel(logging.DEBUG)
+
     hiding_data = False
     recovering_data = False
     analyze = False
@@ -235,7 +231,7 @@ if __name__ == "__main__":
             usage()
             sys.exit(1)
         else:
-            print("Invalid argument {}".format(opt))
+            log.debug("Invalid argument {}".format(opt))
 
     try:
         if analyze:
@@ -245,10 +241,8 @@ if __name__ == "__main__":
         if recovering_data:
             recover_data(image_fp, output_fp, num_bits)
     except Exception as e:
-        print(
-            "Ran into an error during execution.\n",
-            "Check input and try again.\n",
-        )
-        print(e)
+        log.error(
+            "Ran into an error during execution. Check input and try again.")
+        log.exception(e)
         usage()
         sys.exit(1)

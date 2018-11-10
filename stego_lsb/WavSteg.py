@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 import getopt
+import logging
 import math
 import os
 import sys
@@ -29,6 +30,8 @@ from time import time
 
 from stego_lsb.bit_manipulation import (lsb_deinterleave_bytes,
                                         lsb_interleave_bytes)
+
+log = logging.getLogger(__name__)
 
 
 def hide_data(sound_path, file_path, output_path, num_lsb):
@@ -45,13 +48,12 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
     max_bytes_to_hide = (num_samples * num_lsb) // 8
     file_size = os.stat(file_path).st_size
 
-    print("Using {} LSBs, we can hide {} B".format(num_lsb, max_bytes_to_hide))
+    log.debug(f"Using {num_lsb} LSBs, we can hide {max_bytes_to_hide} bytes")
 
-    print("Reading files...".ljust(35), end="", flush=True)
     start = time()
     sound_frames = sound.readframes(num_frames)
     data = open(file_path, "rb").read()
-    print("Done in {:.2f} s".format(time() - start))
+    log.debug(f"Files read \t\tin {time() - start:.2f}s")
 
     if file_size > max_bytes_to_hide:
         required_lsb = math.ceil(file_size * 8 / num_samples)
@@ -64,25 +66,22 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
         # Python's wave module doesn't support higher sample widths
         raise ValueError("File has an unsupported bit-depth")
 
-    print("Hiding {} bytes...".format(file_size).ljust(35), end="", flush=True)
     start = time()
     sound_frames = lsb_interleave_bytes(
         sound_frames, data, num_lsb, byte_depth=sample_width
     )
-    print("Done in {:.2f} s".format(time() - start))
+    log.debug(f"{file_size} bytes hidden \tin {time() - start:.2f}s")
 
-    print("Writing to output wav...".ljust(35), end="", flush=True)
     start = time()
     sound_steg = wave.open(output_path, "w")
     sound_steg.setparams(params)
     sound_steg.writeframes(sound_frames)
     sound_steg.close()
-    print("Done in {:.2f} s".format(time() - start))
+    log.debug(f"Output wav written \tin {time() - start:.2f}s")
 
 
 def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
     """Recover data from the file at sound_path to the file at output_path"""
-    print("Reading files...".ljust(35), end="", flush=True)
     start = time()
     sound = wave.open(sound_path, "r")
 
@@ -90,29 +89,23 @@ def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
     sample_width = sound.getsampwidth()
     num_frames = sound.getnframes()
     sound_frames = sound.readframes(num_frames)
-    print("Done in {:.2f} s".format(time() - start))
+    log.debug("Files read \t\tin {:.2f}s".format(time() - start))
 
     if sample_width != 1 and sample_width != 2:
         # Python's wave module doesn't support higher sample widths
         raise ValueError("File has an unsupported bit-depth")
 
-    print(
-        "Recovering {} bytes...".format(bytes_to_recover).ljust(35),
-        end="",
-        flush=True,
-    )
     start = time()
     data = lsb_deinterleave_bytes(
         sound_frames, 8 * bytes_to_recover, num_lsb, byte_depth=sample_width
     )
-    print("Done in {:.2f} s".format(time() - start))
+    log.debug(f"Recovered {bytes_to_recover} bytes \tin {time() - start:.2f}s")
 
-    print("Writing to output file...".ljust(35), end="", flush=True)
     start = time()
     output_file = open(output_path, "wb+")
     output_file.write(bytes(data))
     output_file.close()
-    print("Done in {:.2f} s".format(time() - start))
+    log.debug(f"Written output file \tin {time() - start:.2f}s")
 
 
 def usage():
@@ -149,6 +142,10 @@ if __name__ == "__main__":
         usage()
         sys.exit(1)
 
+    # enable logging
+    logging.basicConfig(format="%(message)s", level=logging.INFO)
+    log.setLevel(logging.DEBUG)
+
     hiding_data = False
     recovering_data = False
     num_bytes_to_recover = 0
@@ -180,18 +177,19 @@ if __name__ == "__main__":
             usage()
             sys.exit(1)
         else:
-            print("Invalid argument {}".format(opt))
+            log.error(f"Invalid argument {opt}")
 
     try:
+        log.debug(f"Sound file: {sound_fp}")
+        log.debug(f"Input file: {input_fp}")
         if hiding_data:
             hide_data(sound_fp, input_fp, output_fp, num_bits)
         if recovering_data:
             recover_data(sound_fp, output_fp, num_bits, num_bytes_to_recover)
     except Exception as e:
-        print(
-            "Ran into an error during execution.\n",
-            "Check input and try again.\n",
+        log.error(
+            "Ran into an error during execution. Check input and try again."
         )
-        print(e)
+        log.exception(e)
         usage()
         sys.exit(1)

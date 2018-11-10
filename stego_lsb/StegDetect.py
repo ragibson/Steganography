@@ -21,11 +21,14 @@
 # SOFTWARE.
 
 import getopt
+import logging
 import os
 import sys
 from time import time
 
 from PIL import Image
+
+log = logging.getLogger(__name__)
 
 
 def show_lsb(image_path, n):
@@ -48,7 +51,7 @@ def show_lsb(image_path, n):
     ]
 
     image.putdata(color_data)
-    print("Runtime: {0:.2f} s".format(time() - start))
+    log.debug(f"Runtime: {time() - start:.2f}s")
     file_name, file_extension = os.path.splitext(image_path)
     image.save(file_name + "_{}LSBs".format(n) + file_extension)
 
@@ -71,6 +74,10 @@ if __name__ == "__main__":
         usage()
         sys.exit(1)
 
+    # enable logging
+    logging.basicConfig(format="%(message)s", level=logging.INFO)
+    log.setLevel(logging.DEBUG)
+
     # file paths for input file
     input_fp = ""
 
@@ -86,15 +93,14 @@ if __name__ == "__main__":
             usage()
             sys.exit(1)
         else:
-            print("Invalid argument {}".format(opt))
+            log.error(f"Invalid argument {opt}")
 
     try:
         show_lsb(input_fp, num_bits)
     except Exception as e:
-        print(
-            "Ran into an error during execution.\n",
-            "Check input and try again.\n",
+        log.debug(
+            "Ran into an error during execution. Check input and try again."
         )
-        print(e)
+        log.exception(e)
         usage()
         sys.exit(1)
