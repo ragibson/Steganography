@@ -53,26 +53,26 @@ def bytes_in_max_file_size(image, num_lsb):
     return roundup(max_bits_to_hide(image, num_lsb).bit_length() / 8)
 
 
-def hide_data(
-    input_image_path,
-    input_file_path,
-    steg_image_path,
-    num_lsb,
-    compression_level,
-):
-    """Hides the data from the input file in the input image."""
+def hide_message_in_image(input_image, message, num_lsb):
+    """Hides the message in the input image and returns the modified
+    image object.
+    """
     start = time()
-    image, input_file = prepare_hide(input_image_path, input_file_path)
+    # in some cases the image might already be opened
+    if isinstance(input_image, Image.Image):
+        image = input_image
+    else:
+        image = Image.open(input_image)
+
     num_channels = len(image.getdata()[0])
     flattened_color_data = [v for t in image.getdata() for v in t]
 
     # We add the size of the input file to the beginning of the payload.
-    file_size = get_filesize(input_file_path)
-    file_size_tag = file_size.to_bytes(
+    message_size = len(message)
+    file_size_tag = message_size.to_bytes(
         bytes_in_max_file_size(image, num_lsb), byteorder=sys.byteorder
     )
-
-    data = file_size_tag + input_file.read()
+    data = file_size_tag + message
     log.debug(f"Files read \t\tin {time() - start:.2f}s")
 
     if 8 * len(data) > max_bits_to_hide(image, num_lsb):
@@ -85,19 +85,35 @@ def hide_data(
     flattened_color_data = lsb_interleave_list(
         flattened_color_data, data, num_lsb
     )
-    log.debug(f"{file_size} bytes hidden \tin {time() - start:.2f}s")
+    log.debug(f"{message_size} bytes hidden \tin {time() - start:.2f}s")
 
     start = time()
     # PIL expects a sequence of tuples, one per pixel
     image.putdata(list(zip(*[iter(flattened_color_data)] * num_channels)))
+    log.debug(f"Image overwritten \tin {time() - start:.2f}s")
+    return image
+
+
+def hide_data(
+    input_image_path,
+    input_file_path,
+    steg_image_path,
+    num_lsb,
+    compression_level,
+):
+    """Hides the data from the input file in the input image."""
+    image, input_file = prepare_hide(input_image_path, input_file_path)
+    image = hide_message_in_image(image, input_file.read(), num_lsb)
     image.save(steg_image_path, compress_level=compression_level)
-    log.debug(f"Output image written \tin {time() - start:.2f}s")
 
 
-def recover_data(steg_image_path, output_file_path, num_lsb):
-    """Writes the data from the steganographed image to the output file"""
+def recover_message_from_image(input_image, num_lsb):
+    """Returns the message from the steganographed image"""
     start = time()
-    steg_image, output_file = prepare_recover(steg_image_path, output_file_path)
+    if isinstance(input_image, Image.Image):
+        steg_image = input_image
+    else:
+        steg_image = Image.open(input_image)
 
     color_data = [v for t in steg_image.getdata() for v in t]
 
@@ -116,12 +132,18 @@ def recover_data(steg_image_path, output_file_path, num_lsb):
     data = lsb_deinterleave_list(
         color_data[tag_bit_height:], 8 * bytes_to_recover, num_lsb
     )
-    log.debug(f"{bytes_to_recover} bytes recovered \tin {time() - start:.2f} s")
+    log.debug(f"{bytes_to_recover} bytes recovered \tin {time() - start:.2f}s")
+    return data
 
+
+def recover_data(steg_image_path, output_file_path, num_lsb):
+    """Writes the data from the steganographed image to the output file"""
+    steg_image, output_file = prepare_recover(steg_image_path, output_file_path)
+    data = recover_message_from_image(steg_image, num_lsb)
     start = time()
     output_file.write(data)
     output_file.close()
-    log.debug(f"Output file written in {time() - start:.2f}s")
+    log.debug(f"Output file written \tin {time() - start:.2f}s")
 
 
 def analysis(image_file_path, input_file_path, num_lsb):
