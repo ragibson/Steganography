@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-requirements = ["Pillow"]
+requirements = ["Pillow>=5.3.0", "numpy>=1.15.4"]
 
 
 setup(
