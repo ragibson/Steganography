@@ -32,14 +32,14 @@ produce output similar to
     Progress: [################################]
     ----------------------------------------
     | # LSBs | Encode Rate  | Decode rate  |
-    | 1      | 30.5   MB/s  | 46.8   MB/s  |
-    | 2      | 40.5   MB/s  | 41.5   MB/s  |
-    | 3      | 58.5   MB/s  | 60.7   MB/s  |
-    | 4      | 75.6   MB/s  | 80.0   MB/s  |
-    | 5      | 91.1   MB/s  | 97.9   MB/s  |
-    | 6      | 106.0  MB/s  | 114.9  MB/s  |
-    | 7      | 119.7  MB/s  | 132.6  MB/s  |
-    | 8      | 223.3  MB/s  | 652.6  MB/s  |
+    | 1      | 40.1   MB/s  | 56.3   MB/s  |
+    | 2      | 56.6   MB/s  | 52.7   MB/s  |
+    | 3      | 82.5   MB/s  | 77.4   MB/s  |
+    | 4      | 112.4  MB/s  | 105.9  MB/s  |
+    | 5      | 135.9  MB/s  | 129.8  MB/s  |
+    | 6      | 159.9  MB/s  | 152.4  MB/s  |
+    | 7      | 181.7  MB/s  | 174.6  MB/s  |
+    | 8      | 372.8  MB/s  | 902.8  MB/s  |
     ----------------------------------------
 
 <a name = "WavSteg"></a>
@@ -81,9 +81,9 @@ Example:
 
     $ WavSteg.py -h -s sound.wav -f file.txt -o sound_steg.wav -n 2
     Using 2 LSBs, we can hide 6551441 B
-    Reading files...                   Done in 0.02 s
-    Hiding 5589889 bytes...            Done in 0.34 s
-    Writing to output wav...           Done in 0.06 s
+    Reading files...                   Done in 0.01 s
+    Hiding 5589889 bytes...            Done in 0.24 s
+    Writing to output wav...           Done in 0.02 s
 	
 If you attempt to hide too much data, WavSteg will raise a ValueError and
 print the minimum number of LSBs required to hide your data.
@@ -99,7 +99,7 @@ Example:
 
     $ WavSteg.py -r -s sound_steg.wav -o output.txt -n 2 -b 5589889
     Reading files...                   Done in 0.02 s
-    Recovering 5589889 bytes...        Done in 0.26 s
+    Recovering 5589889 bytes...        Done in 0.18 s
     Writing to output file...          Done in 0.00 s
   
 <a name = "LSBSteg"></a>
@@ -151,17 +151,17 @@ The following command will hide data in the input image and write the result to
 the steganographed image, producing output similar to
 
     $ LSBSteg.py -h -i input_image.png -f input_file.zip -o steg.png -n 2 -c 1
-    Reading files...                   Done in 0.36 s
-    Hiding 1566763 bytes...            Done in 0.37 s
-    Writing to output image...         Done in 0.61 s
+    Reading files...                   Done in 0.26 s
+    Hiding 1566763 bytes...            Done in 0.32 s
+    Writing to output image...         Done in 0.47 s
 
 ### Recovering Data
 The following command will recover data from the steganographed image and write
 the result to the output file, producing output similar to
 
     $ LSBSteg.py -r -i steg.png -o output_file.zip -n 2
-    Reading files...                   Done in 0.40 s
-    Recovering 1566763 bytes...        Done in 0.33 s
+    Reading files...                   Done in 0.30 s
+    Recovering 1566763 bytes...        Done in 0.28 s
     Writing to output file...          Done in 0.00 s
 
 <a name = "StegDetect"></a>
@@ -186,4 +186,4 @@ show, the following command will save the resulting image, appending "_nLSBs"
 to the file name, and will produce output similar to the following:
 
     $ StegDetect.py -f image.png -n 2
-    Runtime: 1.01 s
+    Runtime: 0.67 s
