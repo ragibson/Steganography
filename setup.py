@@ -18,7 +18,7 @@ setup(
     license="MIT",
     long_description=readme,
     long_description_content_type="text/markdown",
-    url="https://git.someblocks.com/sh4nks/stego_lsb.git",
+    url="https://github.com/ragibson/Steganography",
     install_requires=requirements,
     entry_points="""
         [console_scripts]
