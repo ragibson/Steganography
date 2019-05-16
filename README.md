@@ -25,8 +25,8 @@ Specifically, it contains four primary functions:
     # Runs lsb_deinterleave_bytes with a List[uint8] carrier.
     lsb_deinterleave_list(carrier, num_bits, num_lsb)
 
-Running `bit_manipulation.py` or calling its `test()` function directly should
-produce output similar to
+Running `bit_manipulation.py`, calling its `test()` function directly, or
+running `stegolsb test` should produce output similar to
 
     Testing 1.0 MB payload -> 10.0 MB carrier...
     Progress: [################################]

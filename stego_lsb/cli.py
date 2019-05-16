@@ -17,7 +17,7 @@ import logging
 
 import click
 
-from stego_lsb import LSBSteg, StegDetect, WavSteg
+from stego_lsb import LSBSteg, StegDetect, WavSteg, bit_manipulation
 
 # enable logging output
 logging.basicConfig(format="%(message)s", level=logging.INFO)
@@ -154,3 +154,9 @@ def wavsteg(
         WavSteg.recover_data(input_fp, output_fp, lsb_count, num_bytes)
     else:
         click.echo(ctx.get_help())
+
+
+@main.command()
+def test():
+    """Runs a performance test and verifies decoding consistency"""
+    bit_manipulation.test()
