@@ -40,7 +40,7 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
     start = time()
     sound_frames = sound.readframes(num_frames)
     data = open(file_path, "rb").read()
-    log.debug(f"Files read \t\tin {time() - start:.2f}s")
+    log.debug(f"Files read".ljust(30) + f" in {time() - start:.2f}s")
 
     if file_size > max_bytes_to_hide:
         required_lsb = math.ceil(file_size * 8 / num_samples)
@@ -57,14 +57,14 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
     sound_frames = lsb_interleave_bytes(
         sound_frames, data, num_lsb, byte_depth=sample_width
     )
-    log.debug(f"{file_size} bytes hidden \tin {time() - start:.2f}s")
+    log.debug(f"{file_size} bytes hidden".ljust(30) + f" in {time() - start:.2f}s")
 
     start = time()
     sound_steg = wave.open(output_path, "w")
     sound_steg.setparams(params)
     sound_steg.writeframes(sound_frames)
     sound_steg.close()
-    log.debug(f"Output wav written \tin {time() - start:.2f}s")
+    log.debug(f"Output wav written".ljust(30) + f" in {time() - start:.2f}s")
 
 
 def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
@@ -76,7 +76,7 @@ def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
     sample_width = sound.getsampwidth()
     num_frames = sound.getnframes()
     sound_frames = sound.readframes(num_frames)
-    log.debug("Files read \t\tin {:.2f}s".format(time() - start))
+    log.debug("Files read".ljust(30) + f" in {time() - start:.2f}s")
 
     if sample_width != 1 and sample_width != 2:
         # Python's wave module doesn't support higher sample widths
@@ -86,10 +86,10 @@ def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
     data = lsb_deinterleave_bytes(
         sound_frames, 8 * bytes_to_recover, num_lsb, byte_depth=sample_width
     )
-    log.debug(f"Recovered {bytes_to_recover} bytes \tin {time() - start:.2f}s")
+    log.debug(f"Recovered {bytes_to_recover} bytes".ljust(30) + f" in {time() - start:.2f}s")
 
     start = time()
     output_file = open(output_path, "wb+")
     output_file.write(bytes(data))
     output_file.close()
-    log.debug(f"Written output file \tin {time() - start:.2f}s")
+    log.debug(f"Written output file".ljust(30) + f" in {time() - start:.2f}s")

@@ -85,7 +85,7 @@ def hide_message_in_image(input_image, message, num_lsb):
         bytes_in_max_file_size(image, num_lsb), byteorder=sys.byteorder
     )
     data = file_size_tag + _str_to_bytes(message)
-    log.debug(f"Files read \t\tin {time() - start:.2f}s")
+    log.debug(f"Files read".ljust(30) + f" in {time() - start:.2f}s")
 
     if 8 * len(data) > max_bits_to_hide(image, num_lsb):
         log.debug(
@@ -97,12 +97,12 @@ def hide_message_in_image(input_image, message, num_lsb):
     flattened_color_data = lsb_interleave_list(
         flattened_color_data, data, num_lsb
     )
-    log.debug(f"{message_size} bytes hidden \tin {time() - start:.2f}s")
+    log.debug(f"{message_size} bytes hidden".ljust(30) + f" in {time() - start:.2f}s")
 
     start = time()
     # PIL expects a sequence of tuples, one per pixel
     image.putdata(list(zip(*[iter(flattened_color_data)] * num_channels)))
-    log.debug(f"Image overwritten \tin {time() - start:.2f}s")
+    log.debug(f"Image overwritten".ljust(30) + f" in {time() - start:.2f}s")
     return image
 
 
@@ -138,13 +138,13 @@ def recover_message_from_image(input_image, num_lsb):
         ),
         byteorder=sys.byteorder,
     )
-    log.debug(f"Files read \t\tin {time() - start:.2f}s")
+    log.debug(f"Files read".ljust(30) + f" in {time() - start:.2f}s")
 
     start = time()
     data = lsb_deinterleave_list(
         color_data[tag_bit_height:], 8 * bytes_to_recover, num_lsb
     )
-    log.debug(f"{bytes_to_recover} bytes recovered \tin {time() - start:.2f}s")
+    log.debug(f"{bytes_to_recover} bytes recovered".ljust(30) + f" in {time() - start:.2f}s")
     return data
 
 
@@ -155,23 +155,18 @@ def recover_data(steg_image_path, output_file_path, num_lsb):
     start = time()
     output_file.write(data)
     output_file.close()
-    log.debug(f"Output file written \tin {time() - start:.2f}s")
+    log.debug(f"Output file written".ljust(30) + f" in {time() - start:.2f}s")
 
 
 def analysis(image_file_path, input_file_path, num_lsb):
     """Print how much data we can hide and the size of the data to be hidden"""
     image = Image.open(image_file_path)
     print(
-        "Image resolution: ({}, {})\n"
-        "Using {} LSBs, we can hide:\t{} B\n"
-        "Size of input file:\t\t{} B\n"
-        "File size tag:\t\t\t{} B"
-        "".format(
-            image.size[0],
-            image.size[1],
-            num_lsb,
-            max_bits_to_hide(image, num_lsb) // 8,
-            get_filesize(input_file_path),
-            bytes_in_max_file_size(image, num_lsb),
-        )
+        f"Image resolution: ({image.size[0]}, {image.size[1]})\n" +
+        f"Using {num_lsb} LSBs, we can hide:".ljust(30) +
+        f" {max_bits_to_hide(image, num_lsb) // 8} B\n" +
+        f"Size of input file:".ljust(30) +
+        f" {get_filesize(input_file_path)} B\n" +
+        f"File size tag:".ljust(30) +
+        f" {bytes_in_max_file_size(image, num_lsb)} B"
     )

@@ -81,10 +81,10 @@ been used out of a theoretical maximum.
 Example:
 
     $ stegolsb wavsteg -h -i sound.wav -s file.txt -o sound_steg.wav -n 2
-    Using 2 LSBs, we can hide 6551441 B
-    Reading files...                   Done in 0.01 s
-    Hiding 5589889 bytes...            Done in 0.24 s
-    Writing to output wav...           Done in 0.02 s
+    Using 2 LSBs, we can hide 6551441 bytes
+    Files read                     in 0.01s
+    5589889 bytes hidden           in 0.24s
+    Output wav written             in 0.03s
 
 If you attempt to hide too much data, WavSteg will raise a ValueError and
 print the minimum number of LSBs required to hide your data.
@@ -99,9 +99,9 @@ be accurate or the result may be too short or contain extraneous data.
 Example:
 
     $ stegolsb wavsteg -r -i sound_steg.wav -o output.txt -n 2 -b 5589889
-    Reading files...                   Done in 0.02 s
-    Recovering 5589889 bytes...        Done in 0.18 s
-    Writing to output file...          Done in 0.00 s
+    Files read                     in 0.02s
+    Recovered 5589889 bytes        in 0.18s
+    Written output file            in 0.00s
 
 <a name = "LSBSteg"></a>
 ## LSBSteg
@@ -144,27 +144,27 @@ hidden. The following command will achieve this, producing output similar to
 
     $ stegolsb steglsb -a -i input_image.png -s input_file.zip -n 2
     Image resolution: (2000, 1100)
-    Using 2 LSBs, we can hide:      1650000 B
-    Size of input file:             1566763 B
-    File size tag:                  3 B
+    Using 2 LSBs, we can hide:     1650000 B
+    Size of input file:            1566763 B
+    File size tag:                 3 B
 
 ### Hiding Data
 The following command will hide data in the input image and write the result to
 the steganographed image, producing output similar to
 
     $ stegolsb steglsb -h -i input_image.png -s input_file.zip -o steg.png -n 2 -c 1
-    Reading files...                   Done in 0.26 s
-    Hiding 1566763 bytes...            Done in 0.32 s
-    Writing to output image...         Done in 0.47 s
+    Files read                     in 0.26s
+    1566763 bytes hidden           in 0.31s
+    Image overwritten              in 0.27s
 
 ### Recovering Data
 The following command will recover data from the steganographed image and write
 the result to the output file, producing output similar to
 
     $ stegolsb steglsb -r -i steg.png -o output_file.zip -n 2
-    Reading files...                   Done in 0.30 s
-    Recovering 1566763 bytes...        Done in 0.28 s
-    Writing to output file...          Done in 0.00 s
+    Files read                     in 0.30s
+    1566763 bytes recovered        in 0.28s
+    Output file written            in 0.00s
 
 <a name = "StegDetect"></a>
 ## StegDetect
@@ -187,5 +187,5 @@ color channel for the pixel. Where n is the number of least significant bits to
 show, the following command will save the resulting image, appending "_nLSBs"
 to the file name, and will produce output similar to the following:
 
-    $ stegolsb stegdetect -i image.png -n 2
-    Runtime: 0.67 s
+    $ stegolsb stegdetect -i input_image.png -n 2
+    Runtime: 0.63s
