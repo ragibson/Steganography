@@ -1,10 +1,24 @@
 # Steganography
 
 # Table of Contents
+  * [Installation](#Installation)
   * [Byte Sequence Manipulation](#ByteSequenceManipulation)
   * [WavSteg](#WavSteg)
   * [LSBSteg](#LSBSteg)
   * [StegDetect](#StegDetect)
+
+<a name = "Installation"></a>
+## Installation
+This project is on [PyPI](https://pypi.org/project/stego-lsb/) and can be
+installed with
+
+    pip install stego-lsb
+
+Alternatively, you can install it from this repository directly:
+
+    git clone https://github.com/ragibson/Steganography
+    cd Steganography
+    python setup.py install
 
 <a name = "ByteSequenceManipulation"></a>
 ## Byte Sequence Manipulation
