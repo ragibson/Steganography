@@ -151,6 +151,6 @@ def wavsteg(
     if hide:
         WavSteg.hide_data(input_fp, secret_fp, output_fp, lsb_count)
     elif recover:
-        WavSteg.recover_data(input_fp, secret_fp, lsb_count, num_bytes)
+        WavSteg.recover_data(input_fp, output_fp, lsb_count, num_bytes)
     else:
         click.echo(ctx.get_help())
