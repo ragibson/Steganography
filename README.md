@@ -25,8 +25,8 @@ Specifically, it contains four primary functions:
     # Runs lsb_deinterleave_bytes with a List[uint8] carrier.
     lsb_deinterleave_list(carrier, num_bits, num_lsb)
 
-Running `bit_manipulation.py` or calling its `test()` function directly should
-produce output similar to
+Running `bit_manipulation.py`, calling its `test()` function directly, or
+running `stegolsb test` should produce output similar to
 
     Testing 1.0 MB payload -> 10.0 MB carrier...
     Progress: [################################]
@@ -55,23 +55,24 @@ WavSteg requires Python 3
 
 Run WavSteg with the following command line arguments:
 
-    -h, --hide        To hide data in a sound file
-    -r, --recover     To recover data from a sound file
-    -s, --sound=      Path to a .wav file
-    -f, --file=       Path to a file to hide in the sound file
-    -o, --output=     Path to an output file
-    -n, --LSBs=       How many LSBs to use
-    -b, --bytes=      How many bytes to recover from the sound file
-    --help            Display this message
-	
+    Command Line Arguments:
+     -h, --hide               To hide data in a sound file
+     -r, --recover            To recover data from a sound file
+     -i, --input TEXT         Path to a .wav file
+     -s, --secret TEXT        Path to a file to hide in the sound file
+     -o, --output TEXT        Path to an output file
+     -n, --lsb-count INTEGER  How many LSBs to use  [default: 2]
+     -b, --bytes INTEGER      How many bytes to recover from the sound file
+     --help                   Show this message and exit.
+
 Example:
 
-    WavSteg.py -h -s sound.wav -f file.txt -o sound_steg.wav -n 1
-	# OR
-	WavSteg.py -r -s sound_steg.wav -o output.txt -n 1 -b 1000
-	
+    $ stegolsb wavsteg -h -i sound.wav -s file.txt -o sound_steg.wav -n 1
+    # OR
+    $ stegolsb wavsteg -r -i sound_steg.wav -o output.txt -n 1 -b 1000
+
 ### Hiding Data
-Hiding data requires the arguments -h, -s, -f, -o, and -n.
+Hiding data requires the arguments -h, -i, -s, -o, and -n.
 
 The following command would hide the contents of file.txt into sound.wav and
 save the result as sound_steg.wav. The command also outputs how many bytes have
@@ -79,17 +80,17 @@ been used out of a theoretical maximum.
 
 Example:
 
-    $ WavSteg.py -h -s sound.wav -f file.txt -o sound_steg.wav -n 2
-    Using 2 LSBs, we can hide 6551441 B
-    Reading files...                   Done in 0.01 s
-    Hiding 5589889 bytes...            Done in 0.24 s
-    Writing to output wav...           Done in 0.02 s
-	
+    $ stegolsb wavsteg -h -i sound.wav -s file.txt -o sound_steg.wav -n 2
+    Using 2 LSBs, we can hide 6551441 bytes
+    Files read                     in 0.01s
+    5589889 bytes hidden           in 0.24s
+    Output wav written             in 0.03s
+
 If you attempt to hide too much data, WavSteg will raise a ValueError and
 print the minimum number of LSBs required to hide your data.
 
 ### Recovering Data
-Recovering data requires the arguments -r, -s, -o, -n, and -b
+Recovering data requires the arguments -r, -i, -o, -n, and -b
 
 The following command would recover the hidden data from sound_steg.wav and
 save it as output.txt. This requires the size in bytes of the hidden data to
@@ -97,11 +98,11 @@ be accurate or the result may be too short or contain extraneous data.
 
 Example:
 
-    $ WavSteg.py -r -s sound_steg.wav -o output.txt -n 2 -b 5589889
-    Reading files...                   Done in 0.02 s
-    Recovering 5589889 bytes...        Done in 0.18 s
-    Writing to output file...          Done in 0.00 s
-  
+    $ stegolsb wavsteg -r -i sound_steg.wav -o output.txt -n 2 -b 5589889
+    Files read                     in 0.02s
+    Recovered 5589889 bytes        in 0.18s
+    Written output file            in 0.00s
+
 <a name = "LSBSteg"></a>
 ## LSBSteg
 LSBSteg uses least significant bit steganography to hide a file in the color
@@ -118,51 +119,52 @@ You need Python 3 and Pillow, a fork of the Python Imaging Library (PIL).
 Run LSBSteg with the following command line arguments:
 
     Command Line Arguments:
-     -h, --hide           To hide data in an image
-     -r, --recover        To recover data from an image
-     -a, --analyze        Print how much data can be hidden in image
-     -i, --image=         Path to a bitmap (.bmp or .png) image
-     -f, --file=          Path to a file to hide in the image
-     -o, --output=        Path to an output file
-     -n, --LSBs=          How many LSBs to use
-     -c, --compression=   1 (best speed) to 9 (smallest file size)
-     --help               Display this message
+     -h, --hide                      To hide data in an image file
+     -r, --recover                   To recover data from an image file
+     -a, --analyze                   Print how much data can be hidden within an image   [default: False]
+     -i, --input TEXT                Path to an bitmap (.bmp or .png) image
+     -s, --secret TEXT               Path to a file to hide in the image
+     -o, --output TEXT               Path to an output file
+     -n, --lsb-count INTEGER         How many LSBs to use  [default: 2]
+     -c, --compression INTEGER RANGE
+                                     1 (best speed) to 9 (smallest file size)  [default: 1]
+     --help                          Show this message and exit.
 
 Example:
 
-    LSBSteg.py -a -i input_image.png -f input_file.zip -n 2
+    $ stegolsb steglsb -a -i input_image.png -s input_file.zip -n 2
     # OR
-    LSBSteg.py -h -i input_image.png -f input_file.zip -o steg.png -n 2 -c 1
+    $ stegolsb steglsb -h -i input_image.png -s input_file.zip -o steg.png -n 2 -c 1
     # OR
-    LSBSteg.py -r -i steg.png -o output_file.zip -n 2
+    $ stegolsb steglsb -r -i steg.png -o output_file.zip -n 2
 
 ### Analyzing
 Before hiding data in an image, it can useful to see how much data can be
 hidden. The following command will achieve this, producing output similar to
 
-    $ LSBSteg.py -a -i input_image.png -f input_file.zip -n 2
+    $ stegolsb steglsb -a -i input_image.png -s input_file.zip -n 2
     Image resolution: (2000, 1100)
-    Using 2 LSBs, we can hide:      1650000 B
-    Size of input file:             1566763 B
-    File size tag:                  3 B
-	
+    Using 2 LSBs, we can hide:     1650000 B
+    Size of input file:            1566763 B
+    File size tag:                 3 B
+
 ### Hiding Data
 The following command will hide data in the input image and write the result to
 the steganographed image, producing output similar to
 
-    $ LSBSteg.py -h -i input_image.png -f input_file.zip -o steg.png -n 2 -c 1
-    Reading files...                   Done in 0.26 s
-    Hiding 1566763 bytes...            Done in 0.32 s
-    Writing to output image...         Done in 0.47 s
+    $ stegolsb steglsb -h -i input_image.png -s input_file.zip -o steg.png -n 2 -c 1
+    Files read                     in 0.26s
+    1566763 bytes hidden           in 0.31s
+    Image overwritten              in 0.27s
 
 ### Recovering Data
 The following command will recover data from the steganographed image and write
 the result to the output file, producing output similar to
 
-    $ LSBSteg.py -r -i steg.png -o output_file.zip -n 2
-    Reading files...                   Done in 0.30 s
-    Recovering 1566763 bytes...        Done in 0.28 s
-    Writing to output file...          Done in 0.00 s
+    $ stegolsb steglsb -r -i steg.png -o output_file.zip -n 2
+    Files read                     in 0.30s
+    1566763 bytes recovered        in 0.28s
+    Output file written            in 0.00s
 
 <a name = "StegDetect"></a>
 ## StegDetect
@@ -174,10 +176,10 @@ You need Python 3 and Pillow, a fork of the Python Imaging Library (PIL).
 Run StegDetect with the following command line arguments:
 
     Command Line Arguments:
-     -f, --file=       Path to an image
-     -n, --LSBs=       How many LSBs to display
-     --help            Display this message
-	
+     -i, --input TEXT         Path to an image
+     -n, --lsb-count INTEGER  How many LSBs to display  [default: 2]
+     --help                   Show this message and exit.
+
 ### Showing the Least Significant Bits of an Image
 We sum the least significant n bits of the RGB color channels for each pixel
 and normalize the result to the range 0-255. This value is then applied to each
@@ -185,5 +187,5 @@ color channel for the pixel. Where n is the number of least significant bits to
 show, the following command will save the resulting image, appending "_nLSBs"
 to the file name, and will produce output similar to the following:
 
-    $ StegDetect.py -f image.png -n 2
-    Runtime: 0.67 s
+    $ stegolsb stegdetect -i input_image.png -n 2
+    Runtime: 0.63s
