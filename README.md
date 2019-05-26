@@ -18,7 +18,7 @@ Alternatively, you can install it from this repository directly:
 
     git clone https://github.com/ragibson/Steganography
     cd Steganography
-    python setup.py install
+    python3 setup.py install
 
 <a name = "ByteSequenceManipulation"></a>
 ## Byte Sequence Manipulation
