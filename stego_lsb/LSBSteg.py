@@ -89,8 +89,8 @@ def hide_message_in_image(input_image, message, num_lsb):
 
     if 8 * len(data) > max_bits_to_hide(image, num_lsb):
         log.debug(
-            f"Only able to hide {max_bits_to_hide(image, num_lsb) // 8} bytes ",
-            "in image. PROCESS WILL FAIL!",
+            f"Only able to hide {max_bits_to_hide(image, num_lsb) // 8} bytes " +
+            "in image. PROCESS WILL FAIL!"
         )
 
     start = time()
