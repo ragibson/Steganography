@@ -16,8 +16,11 @@ from time import time
 
 from PIL import Image
 
-from stego_lsb.bit_manipulation import (lsb_deinterleave_list,
-                                        lsb_interleave_list, roundup)
+from stego_lsb.bit_manipulation import (
+    lsb_deinterleave_list,
+    lsb_interleave_list,
+    roundup,
+)
 
 log = logging.getLogger(__name__)
 
@@ -89,14 +92,12 @@ def hide_message_in_image(input_image, message, num_lsb):
 
     if 8 * len(data) > max_bits_to_hide(image, num_lsb):
         raise ValueError(
-            f"Only able to hide {max_bits_to_hide(image, num_lsb) // 8} bytes " +
-            f"in this image with {num_lsb} LSBs, but {len(data)} bytes were requested"
+            f"Only able to hide {max_bits_to_hide(image, num_lsb) // 8} bytes "
+            + f"in this image with {num_lsb} LSBs, but {len(data)} bytes were requested"
         )
 
     start = time()
-    flattened_color_data = lsb_interleave_list(
-        flattened_color_data, data, num_lsb
-    )
+    flattened_color_data = lsb_interleave_list(flattened_color_data, data, num_lsb)
     log.debug(f"{message_size} bytes hidden".ljust(30) + f" in {time() - start:.2f}s")
 
     start = time()
@@ -107,11 +108,7 @@ def hide_message_in_image(input_image, message, num_lsb):
 
 
 def hide_data(
-    input_image_path,
-    input_file_path,
-    steg_image_path,
-    num_lsb,
-    compression_level,
+    input_image_path, input_file_path, steg_image_path, num_lsb, compression_level
 ):
     """Hides the data from the input file in the input image."""
     image, input_file = prepare_hide(input_image_path, input_file_path)
@@ -144,7 +141,9 @@ def recover_message_from_image(input_image, num_lsb):
     data = lsb_deinterleave_list(
         color_data[tag_bit_height:], 8 * bytes_to_recover, num_lsb
     )
-    log.debug(f"{bytes_to_recover} bytes recovered".ljust(30) + f" in {time() - start:.2f}s")
+    log.debug(
+        f"{bytes_to_recover} bytes recovered".ljust(30) + f" in {time() - start:.2f}s"
+    )
     return data
 
 
@@ -162,11 +161,11 @@ def analysis(image_file_path, input_file_path, num_lsb):
     """Print how much data we can hide and the size of the data to be hidden"""
     image = Image.open(image_file_path)
     print(
-        f"Image resolution: ({image.size[0]}, {image.size[1]})\n" +
-        f"Using {num_lsb} LSBs, we can hide:".ljust(30) +
-        f" {max_bits_to_hide(image, num_lsb) // 8} B\n" +
-        f"Size of input file:".ljust(30) +
-        f" {get_filesize(input_file_path)} B\n" +
-        f"File size tag:".ljust(30) +
-        f" {bytes_in_max_file_size(image, num_lsb)} B"
+        f"Image resolution: ({image.size[0]}, {image.size[1]})\n"
+        + f"Using {num_lsb} LSBs, we can hide:".ljust(30)
+        + f" {max_bits_to_hide(image, num_lsb) // 8} B\n"
+        + f"Size of input file:".ljust(30)
+        + f" {get_filesize(input_file_path)} B\n"
+        + f"File size tag:".ljust(30)
+        + f" {bytes_in_max_file_size(image, num_lsb)} B"
     )

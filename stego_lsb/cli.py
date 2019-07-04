@@ -32,9 +32,7 @@ def main(args=None):
 
 
 @main.command(context_settings=dict(max_content_width=120))
-@click.option(
-    "--hide", "-h", is_flag=True, help="To hide data in an image file"
-)
+@click.option("--hide", "-h", is_flag=True, help="To hide data in an image file")
 @click.option(
     "--recover", "-r", is_flag=True, help="To recover data from an image file"
 )
@@ -49,9 +47,7 @@ def main(args=None):
 @click.option(
     "--input", "-i", "input_fp", help="Path to an bitmap (.bmp or .png) image"
 )
-@click.option(
-    "--secret", "-s", "secret_fp", help="Path to a file to hide in the image"
-)
+@click.option("--secret", "-s", "secret_fp", help="Path to a file to hide in the image")
 @click.option("--output", "-o", "output_fp", help="Path to an output file")
 @click.option(
     "--lsb-count",
@@ -71,15 +67,7 @@ def main(args=None):
 )
 @click.pass_context
 def steglsb(
-    ctx,
-    hide,
-    recover,
-    analyze,
-    input_fp,
-    secret_fp,
-    output_fp,
-    lsb_count,
-    compression,
+    ctx, hide, recover, analyze, input_fp, secret_fp, output_fp, lsb_count, compression
 ):
     """Hides or recovers data in and from an image"""
     try:
@@ -87,9 +75,7 @@ def steglsb(
             LSBSteg.analysis(input_fp, secret_fp, lsb_count)
 
         if hide:
-            LSBSteg.hide_data(
-                input_fp, secret_fp, output_fp, lsb_count, compression
-            )
+            LSBSteg.hide_data(input_fp, secret_fp, output_fp, lsb_count, compression)
         elif recover:
             LSBSteg.recover_data(input_fp, output_fp, lsb_count)
 
@@ -121,15 +107,10 @@ def stegdetect(ctx, image_path, lsb_count):
 
 @main.command()
 @click.option("--hide", "-h", is_flag=True, help="To hide data in a sound file")
-@click.option(
-    "--recover", "-r", is_flag=True, help="To recover data from a sound file"
-)
+@click.option("--recover", "-r", is_flag=True, help="To recover data from a sound file")
 @click.option("--input", "-i", "input_fp", help="Path to a .wav file")
 @click.option(
-    "--secret",
-    "-s",
-    "secret_fp",
-    help="Path to a file to hide in the sound file",
+    "--secret", "-s", "secret_fp", help="Path to a file to hide in the sound file"
 )
 @click.option("--output", "-o", "output_fp", help="Path to an output file")
 @click.option(
@@ -148,9 +129,7 @@ def stegdetect(ctx, image_path, lsb_count):
     type=int,
 )
 @click.pass_context
-def wavsteg(
-    ctx, hide, recover, input_fp, secret_fp, output_fp, lsb_count, num_bytes
-):
+def wavsteg(ctx, hide, recover, input_fp, secret_fp, output_fp, lsb_count, num_bytes):
     """Hides or recovers data in and from a sound file"""
     try:
         if hide:

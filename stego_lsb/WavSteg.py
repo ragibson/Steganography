@@ -15,8 +15,7 @@ import os
 import wave
 from time import time
 
-from stego_lsb.bit_manipulation import (lsb_deinterleave_bytes,
-                                        lsb_interleave_bytes)
+from stego_lsb.bit_manipulation import lsb_deinterleave_bytes, lsb_interleave_bytes
 
 log = logging.getLogger(__name__)
 
@@ -86,7 +85,9 @@ def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
     data = lsb_deinterleave_bytes(
         sound_frames, 8 * bytes_to_recover, num_lsb, byte_depth=sample_width
     )
-    log.debug(f"Recovered {bytes_to_recover} bytes".ljust(30) + f" in {time() - start:.2f}s")
+    log.debug(
+        f"Recovered {bytes_to_recover} bytes".ljust(30) + f" in {time() - start:.2f}s"
+    )
 
     start = time()
     output_file = open(output_path, "wb+")
