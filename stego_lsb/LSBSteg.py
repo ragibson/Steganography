@@ -111,6 +111,13 @@ def hide_data(
     input_image_path, input_file_path, steg_image_path, num_lsb, compression_level
 ):
     """Hides the data from the input file in the input image."""
+    if input_image_path is None:
+        raise ValueError("LSBSteg hiding requires an input image file path")
+    if input_file_path is None:
+        raise ValueError("LSBSteg hiding requires a secret file path")
+    if steg_image_path is None:
+        raise ValueError("LSBSteg hiding requires an output image file path")
+
     image, input_file = prepare_hide(input_image_path, input_file_path)
     image = hide_message_in_image(image, input_file.read(), num_lsb)
     image.save(steg_image_path, compress_level=compression_level)
@@ -149,6 +156,11 @@ def recover_message_from_image(input_image, num_lsb):
 
 def recover_data(steg_image_path, output_file_path, num_lsb):
     """Writes the data from the steganographed image to the output file"""
+    if steg_image_path is None:
+        raise ValueError("LSBSteg recovery requires an input image file path")
+    if output_file_path is None:
+        raise ValueError("LSBSteg recovery requires an output file path")
+
     steg_image, output_file = prepare_recover(steg_image_path, output_file_path)
     data = recover_message_from_image(steg_image, num_lsb)
     start = time()
@@ -159,6 +171,11 @@ def recover_data(steg_image_path, output_file_path, num_lsb):
 
 def analysis(image_file_path, input_file_path, num_lsb):
     """Print how much data we can hide and the size of the data to be hidden"""
+    if image_file_path is None:
+        raise ValueError("LSBSteg analysis requires an input image file path")
+    if input_file_path is None:
+        raise ValueError("LSBSteg analysis requires a secret file path")
+
     image = Image.open(image_file_path)
     print(
         f"Image resolution: ({image.size[0]}, {image.size[1]})\n"
