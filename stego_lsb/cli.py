@@ -82,17 +82,21 @@ def steglsb(
     compression,
 ):
     """Hides or recovers data in and from an image"""
-    if analyze:
-        LSBSteg.analysis(input_fp, secret_fp, lsb_count)
+    try:
+        if analyze:
+            LSBSteg.analysis(input_fp, secret_fp, lsb_count)
 
-    if hide:
-        LSBSteg.hide_data(
-            input_fp, secret_fp, output_fp, lsb_count, compression
-        )
-    elif recover:
-        LSBSteg.recover_data(input_fp, output_fp, lsb_count)
+        if hide:
+            LSBSteg.hide_data(
+                input_fp, secret_fp, output_fp, lsb_count, compression
+            )
+        elif recover:
+            LSBSteg.recover_data(input_fp, output_fp, lsb_count)
 
-    if not hide and not recover and not analyze:
+        if not hide and not recover and not analyze:
+            click.echo(ctx.get_help())
+    except ValueError as e:
+        log.debug(e)
         click.echo(ctx.get_help())
 
 
@@ -148,11 +152,15 @@ def wavsteg(
     ctx, hide, recover, input_fp, secret_fp, output_fp, lsb_count, num_bytes
 ):
     """Hides or recovers data in and from a sound file"""
-    if hide:
-        WavSteg.hide_data(input_fp, secret_fp, output_fp, lsb_count)
-    elif recover:
-        WavSteg.recover_data(input_fp, output_fp, lsb_count, num_bytes)
-    else:
+    try:
+        if hide:
+            WavSteg.hide_data(input_fp, secret_fp, output_fp, lsb_count)
+        elif recover:
+            WavSteg.recover_data(input_fp, output_fp, lsb_count, num_bytes)
+        else:
+            click.echo(ctx.get_help())
+    except ValueError as e:
+        log.debug(e)
         click.echo(ctx.get_help())
 
 
