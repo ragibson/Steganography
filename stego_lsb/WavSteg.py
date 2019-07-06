@@ -22,6 +22,13 @@ log = logging.getLogger(__name__)
 
 def hide_data(sound_path, file_path, output_path, num_lsb):
     """Hide data from the file at file_path in the sound file at sound_path"""
+    if sound_path is None:
+        raise ValueError("WavSteg hiding requires an input sound file path")
+    if file_path is None:
+        raise ValueError("WavSteg hiding requires a secret file path")
+    if output_path is None:
+        raise ValueError("WavSteg hiding requires an output sound file path")
+
     sound = wave.open(sound_path, "r")
 
     params = sound.getparams()
@@ -68,6 +75,13 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
 
 def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
     """Recover data from the file at sound_path to the file at output_path"""
+    if sound_path is None:
+        raise ValueError("WavSteg recovery requires an input sound file path")
+    if output_path is None:
+        raise ValueError("WavSteg recovery requires an output file path")
+    if bytes_to_recover is None:
+        raise ValueError("WavSteg recovery requires the number of bytes to recover")
+
     start = time()
     sound = wave.open(sound_path, "r")
 

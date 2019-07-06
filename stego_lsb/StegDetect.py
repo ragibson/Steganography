@@ -21,6 +21,9 @@ log = logging.getLogger(__name__)
 
 def show_lsb(image_path, n):
     """Shows the n least significant bits of image"""
+    if image_path is None:
+        raise ValueError("StegDetect requires an input image file path")
+
     start = time()
     image = Image.open(image_path)
 
