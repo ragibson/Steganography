@@ -86,7 +86,7 @@ Example:
     $ stegolsb wavsteg -r -i sound_steg.wav -o output.txt -n 1 -b 1000
 
 ### Hiding Data
-Hiding data requires the arguments -h, -i, -s, -o, and -n.
+Hiding data uses the arguments -h, -i, -s, -o, and -n.
 
 The following command would hide the contents of file.txt into sound.wav and
 save the result as sound_steg.wav. The command also outputs how many bytes have
@@ -100,11 +100,11 @@ Example:
     5589889 bytes hidden           in 0.24s
     Output wav written             in 0.03s
 
-If you attempt to hide too much data, WavSteg will raise a ValueError and
-print the minimum number of LSBs required to hide your data.
+If you attempt to hide too much data, WavSteg will print the minimum number of
+LSBs required to hide your data.
 
 ### Recovering Data
-Recovering data requires the arguments -r, -i, -o, -n, and -b
+Recovering data uses the arguments -r, -i, -o, -n, and -b
 
 The following command would recover the hidden data from sound_steg.wav and
 save it as output.txt. This requires the size in bytes of the hidden data to
