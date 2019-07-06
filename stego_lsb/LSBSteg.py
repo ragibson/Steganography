@@ -173,16 +173,18 @@ def analysis(image_file_path, input_file_path, num_lsb):
     """Print how much data we can hide and the size of the data to be hidden"""
     if image_file_path is None:
         raise ValueError("LSBSteg analysis requires an input image file path")
-    if input_file_path is None:
-        raise ValueError("LSBSteg analysis requires a secret file path")
 
     image = Image.open(image_file_path)
     print(
         f"Image resolution: ({image.size[0]}, {image.size[1]})\n"
         + f"Using {num_lsb} LSBs, we can hide:".ljust(30)
-        + f" {max_bits_to_hide(image, num_lsb) // 8} B\n"
-        + f"Size of input file:".ljust(30)
-        + f" {get_filesize(input_file_path)} B\n"
-        + f"File size tag:".ljust(30)
-        + f" {bytes_in_max_file_size(image, num_lsb)} B"
+        + f" {max_bits_to_hide(image, num_lsb) // 8} B"
     )
+
+    if input_file_path is not None:
+        print(
+            f"Size of input file:".ljust(30)
+            + f" {get_filesize(input_file_path)} B\n"
+            + f"File size tag:".ljust(30)
+            + f" {bytes_in_max_file_size(image, num_lsb)} B"
+        )
