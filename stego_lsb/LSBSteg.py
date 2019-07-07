@@ -142,6 +142,15 @@ def recover_message_from_image(input_image, num_lsb):
         ),
         byteorder=sys.byteorder,
     )
+
+    maximum_bytes_in_image = num_lsb * len(color_data[tag_bit_height:]) // 8
+    if bytes_to_recover > maximum_bytes_in_image:
+        raise ValueError(
+            f"This image appears to be corrupted.\n"
+            + f"It claims to hold {bytes_to_recover} B, "
+            + f"but can only hold {maximum_bytes_in_image} B with {num_lsb} LSBs"
+        )
+
     log.debug(f"Files read".ljust(30) + f" in {time() - start:.2f}s")
 
     start = time()
