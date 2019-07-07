@@ -183,8 +183,7 @@ def analysis(image_file_path, input_file_path, num_lsb):
 
     if input_file_path is not None:
         print(
-            f"Size of input file:".ljust(30)
-            + f" {get_filesize(input_file_path)} B\n"
-            + f"File size tag:".ljust(30)
-            + f" {bytes_in_max_file_size(image, num_lsb)} B"
+            f"Size of input file:".ljust(30) + f" {get_filesize(input_file_path)} B\n"
         )
+
+    print(f"File size tag:".ljust(30) + f" {bytes_in_max_file_size(image, num_lsb)} B")
