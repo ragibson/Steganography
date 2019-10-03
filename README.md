@@ -6,6 +6,7 @@
   * [WavSteg](#WavSteg)
   * [LSBSteg](#LSBSteg)
   * [StegDetect](#StegDetect)
+  * [StegHide](#StegHide)
 
 <a name = "Installation"></a>
 ## Installation
@@ -203,3 +204,28 @@ to the file name, and will produce output similar to the following:
 
     $ stegolsb stegdetect -i input_image.png -n 2
     Runtime: 0.63s
+    
+    <a name = "StegHide"></a>
+  ## StegHide
+  Steghide  is  a steganography program that is able to hide
+   data in various  kinds  of  image-  and  audio-files.  The
+   color- respectivly sample-frequencies are not changed thus
+   making the embedding resistant against first-order 
+   statistical tests.
+   
+   ### How to Use
+   Run StegHide with the following command line arguments:
+   
+       Command-Line Arguments:
+       For Embedding:
+         -ef, --embedfile filename
+         -sf, --stegofile filename
+         -p passphrase
+       For Extracting:
+         -sf, --stegofile filename
+         -xf, --extractfile filename
+         -p passphrase
+      
+      $ steghide embed -ef image.jpg -sf secret.txt -p password123
+      $ steghide extract -sf image.jpg -xf filename.txt -p password123
+
