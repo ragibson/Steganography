@@ -60,7 +60,7 @@ def lsb_interleave_bytes(carrier, payload, num_lsb, truncate=False, byte_depth=1
     carrier_bits[:, 8 - num_lsb : 8] = payload_bits.reshape(bit_height, num_lsb)
 
     ret = np.packbits(carrier_bits).tobytes()
-    return ret if truncate else ret + carrier[bit_height:]
+    return ret if truncate else ret + carrier[(bit_height*byte_depth):]
 
 
 def lsb_deinterleave_bytes(carrier, num_bits, num_lsb, byte_depth=1):
