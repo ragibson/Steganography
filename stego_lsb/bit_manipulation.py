@@ -46,12 +46,14 @@ def lsb_interleave_bytes(carrier, payload, num_lsb, truncate=False, byte_depth=1
     """
 
     plen = len(payload)
-    payload_bits = np.zeros(shape=(roundup(plen, num_lsb), 8), dtype=np.uint8)
+    payload_bits = np.zeros(shape=(plen, 8), dtype=np.uint8)
     payload_bits[:plen, :] = np.unpackbits(
         np.frombuffer(payload, dtype=np.uint8, count=plen)
     ).reshape(plen, 8)
 
-    bit_height = roundup(np.size(payload_bits) / num_lsb)
+    bit_height = roundup(plen * 8 / num_lsb)
+    payload_bits.resize(bit_height * num_lsb)
+
     carrier_dtype = byte_depth_to_dtype[byte_depth]
     carrier_bits = np.unpackbits(
         np.frombuffer(carrier, dtype=carrier_dtype, count=bit_height).view(np.uint8)
