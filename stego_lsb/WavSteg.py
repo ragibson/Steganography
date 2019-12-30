@@ -45,7 +45,8 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
 
     start = time()
     sound_frames = sound.readframes(num_frames)
-    data = open(file_path, "rb").read()
+    with open(file_path, "rb") as file:
+        data = file.read()
     log.debug(f"Files read".ljust(30) + f" in {time() - start:.2f}s")
 
     if file_size > max_bytes_to_hide:
