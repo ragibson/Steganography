@@ -28,10 +28,10 @@ class TestBitManipulation(unittest.TestCase):
         np.random.seed(0)
         for _ in range(num_trials):
             carrier_len = np.random.randint(1, 16384)
-            num_lsb = np.random.randint(1, 8 * byte_depth)
+            num_lsb = np.random.randint(1, 8 * byte_depth + 1)
             payload_len = carrier_len * num_lsb // (8 * byte_depth)
-            carrier = np.random.randint(0, 255, size=carrier_len).tobytes()
-            payload = np.random.randint(0, 255, size=payload_len).tobytes()
+            carrier = np.random.randint(0, 256, size=carrier_len).tobytes()
+            payload = np.random.randint(0, 256, size=payload_len).tobytes()
             self.assertConsistentInterleaving(
                 carrier, payload, num_lsb, byte_depth=byte_depth
             )
