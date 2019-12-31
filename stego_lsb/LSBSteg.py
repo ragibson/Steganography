@@ -120,6 +120,7 @@ def hide_data(
 
     image, input_file = prepare_hide(input_image_path, input_file_path)
     image = hide_message_in_image(image, input_file.read(), num_lsb)
+    input_file.close()
     image.save(steg_image_path, compress_level=compression_level)
 
 
