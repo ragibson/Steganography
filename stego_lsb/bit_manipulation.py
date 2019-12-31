@@ -91,8 +91,7 @@ def lsb_interleave_list(carrier, payload, num_lsb):
 
     This is slower than working with bytes directly, but is often
     unavoidable if working with libraries that require using lists."""
-
-    bit_height = roundup(8 * roundup(len(payload), num_lsb) / num_lsb)
+    bit_height = roundup(8 * len(payload) / num_lsb)
     carrier_bytes = np.array(carrier[:bit_height], dtype=np.uint8).tobytes()
     interleaved = lsb_interleave_bytes(carrier_bytes, payload, num_lsb, truncate=True)
     carrier[:bit_height] = np.frombuffer(interleaved, dtype=np.uint8).tolist()
