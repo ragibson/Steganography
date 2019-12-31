@@ -8,13 +8,15 @@ import wave
 
 
 class TestWavSteg(unittest.TestCase):
-    def write_random_wav(self, filename, sample_width, framerate, num_frames):
+    def write_random_wav(
+        self, filename, num_channels, sample_width, framerate, num_frames
+    ):
         if sample_width != 1 and sample_width != 2:
             # WavSteg doesn't support higher sample widths
             raise ValueError("File has an unsupported bit-depth")
 
         file = wave.open(filename, "w")
-        file.setnchannels(1)
+        file.setnchannels(num_channels)
         file.setsampwidth(sample_width)
         file.setframerate(framerate)
 
@@ -24,7 +26,7 @@ class TestWavSteg(unittest.TestCase):
             dtype = np.uint16
 
         data = np.random.randint(
-            0, 2 ** (8 * sample_width), dtype=dtype, size=num_frames
+            0, 2 ** (8 * sample_width), dtype=dtype, size=num_frames * num_channels
         )
         file.writeframes(data)
 
@@ -32,9 +34,7 @@ class TestWavSteg(unittest.TestCase):
         with open(filename, "wb") as file:
             file.write(os.urandom(num_bytes))
 
-    def check_random_interleaving(
-        self, byte_depth=1, num_trials=1024, filename_length=10
-    ):
+    def check_random_interleaving(self, byte_depth=1, num_trials=64, filename_length=5):
         filename = "".join(
             choice(string.ascii_lowercase) for _ in range(filename_length)
         )
@@ -45,12 +45,14 @@ class TestWavSteg(unittest.TestCase):
 
         np.random.seed(0)
         for _ in range(num_trials):
+            num_channels = np.random.randint(1, 64)
             num_frames = np.random.randint(1, 16384)
             num_lsb = np.random.randint(1, 8 * byte_depth + 1)
-            payload_len = (num_frames * num_lsb) // 8
+            payload_len = (num_frames * num_lsb * num_channels) // 8
 
             self.write_random_wav(
                 wav_input_filename,
+                num_channels=num_channels,
                 sample_width=byte_depth,
                 framerate=44100,
                 num_frames=num_frames,
