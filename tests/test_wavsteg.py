@@ -82,12 +82,12 @@ class TestWavSteg(unittest.TestCase):
                 input_payload_data = input_file.read()
                 output_payload_data = output_file.read()
 
-            self.assertEqual(input_payload_data, output_payload_data)
+            os.remove(wav_input_filename)
+            os.remove(payload_input_filename)
+            os.remove(wav_output_filename)
+            os.remove(payload_output_filename)
 
-        os.remove(wav_input_filename)
-        os.remove(payload_input_filename)
-        os.remove(wav_output_filename)
-        os.remove(payload_output_filename)
+            self.assertEqual(input_payload_data, output_payload_data)
 
     def test_consistency_8bit(self):
         self.check_random_interleaving(byte_depth=1)
