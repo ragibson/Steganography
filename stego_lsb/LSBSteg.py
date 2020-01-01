@@ -120,6 +120,7 @@ def hide_data(
 
     image, input_file = prepare_hide(input_image_path, input_file_path)
     image = hide_message_in_image(image, input_file.read(), num_lsb)
+    input_file.close()
     image.save(steg_image_path, compress_level=compression_level)
 
 
@@ -143,7 +144,9 @@ def recover_message_from_image(input_image, num_lsb):
         byteorder=sys.byteorder,
     )
 
-    maximum_bytes_in_image = num_lsb * len(color_data[tag_bit_height:]) // 8
+    maximum_bytes_in_image = (
+        max_bits_to_hide(steg_image, num_lsb) // 8 - file_size_tag_size
+    )
     if bytes_to_recover > maximum_bytes_in_image:
         raise ValueError(
             f"This image appears to be corrupted.\n"
@@ -155,8 +158,8 @@ def recover_message_from_image(input_image, num_lsb):
 
     start = time()
     data = lsb_deinterleave_list(
-        color_data[tag_bit_height:], 8 * bytes_to_recover, num_lsb
-    )
+        color_data, 8 * (bytes_to_recover + file_size_tag_size), num_lsb
+    )[file_size_tag_size:]
     log.debug(
         f"{bytes_to_recover} bytes recovered".ljust(30) + f" in {time() - start:.2f}s"
     )
