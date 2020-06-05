@@ -1,0 +1,4 @@
+# These packages are from the setup.py dependencies
+Pillow>=5.3.0
+numpy>=1.15.4
+Click>=7.0
