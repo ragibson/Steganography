@@ -3,11 +3,9 @@ import numpy as np
 import os
 from PIL import Image
 from stego_lsb.bit_manipulation import roundup
-from stego_lsb.LSBSteg import hide_data, recover_data, bytes_in_max_file_size
+from stego_lsb.LSBSteg import hide_data, recover_data
 import string
 import unittest
-
-import logging
 
 
 class TestLSBSteg(unittest.TestCase):
@@ -63,7 +61,7 @@ class TestLSBSteg(unittest.TestCase):
                 raise e
 
             with open(payload_input_filename, "rb") as input_file, open(
-                payload_output_filename, "rb"
+                    payload_output_filename, "rb"
             ) as output_file:
                 input_payload_data = input_file.read()
                 output_payload_data = output_file.read()

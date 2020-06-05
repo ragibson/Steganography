@@ -67,7 +67,7 @@ def main(args=None):
 )
 @click.pass_context
 def steglsb(
-    ctx, hide, recover, analyze, input_fp, secret_fp, output_fp, lsb_count, compression
+        ctx, hide, recover, analyze, input_fp, secret_fp, output_fp, lsb_count, compression
 ):
     """Hides or recovers data in and from an image"""
     try:

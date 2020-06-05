@@ -47,13 +47,13 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
     sound_frames = sound.readframes(num_frames)
     with open(file_path, "rb") as file:
         data = file.read()
-    log.debug(f"Files read".ljust(30) + f" in {time() - start:.2f}s")
+    log.debug("Files read".ljust(30) + f" in {time() - start:.2f}s")
 
     if file_size > max_bytes_to_hide:
         required_lsb = math.ceil(file_size * 8 / num_samples)
         raise ValueError(
             "Input file too large to hide, "
-            "requires {} LSBs, using {}".format(required_lsb, num_lsb)
+            f"requires {required_lsb} LSBs, using {num_lsb}"
         )
 
     if sample_width != 1 and sample_width != 2:
@@ -71,7 +71,7 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
     sound_steg.setparams(params)
     sound_steg.writeframes(sound_frames)
     sound_steg.close()
-    log.debug(f"Output wav written".ljust(30) + f" in {time() - start:.2f}s")
+    log.debug("Output wav written".ljust(30) + f" in {time() - start:.2f}s")
 
 
 def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
@@ -86,7 +86,7 @@ def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
     start = time()
     sound = wave.open(sound_path, "r")
 
-    num_channels = sound.getnchannels()
+    # num_channels = sound.getnchannels()
     sample_width = sound.getsampwidth()
     num_frames = sound.getnframes()
     sound_frames = sound.readframes(num_frames)
@@ -108,4 +108,4 @@ def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
     output_file = open(output_path, "wb+")
     output_file.write(bytes(data))
     output_file.close()
-    log.debug(f"Written output file".ljust(30) + f" in {time() - start:.2f}s")
+    log.debug("Written output file".ljust(30) + f" in {time() - start:.2f}s")

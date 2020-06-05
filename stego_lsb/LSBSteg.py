@@ -88,7 +88,7 @@ def hide_message_in_image(input_image, message, num_lsb):
         bytes_in_max_file_size(image, num_lsb), byteorder=sys.byteorder
     )
     data = file_size_tag + _str_to_bytes(message)
-    log.debug(f"Files read".ljust(30) + f" in {time() - start:.2f}s")
+    log.debug("Files read".ljust(30) + f" in {time() - start:.2f}s")
 
     if 8 * len(data) > max_bits_to_hide(image, num_lsb):
         raise ValueError(
@@ -103,12 +103,12 @@ def hide_message_in_image(input_image, message, num_lsb):
     start = time()
     # PIL expects a sequence of tuples, one per pixel
     image.putdata(list(zip(*[iter(flattened_color_data)] * num_channels)))
-    log.debug(f"Image overwritten".ljust(30) + f" in {time() - start:.2f}s")
+    log.debug("Image overwritten".ljust(30) + f" in {time() - start:.2f}s")
     return image
 
 
 def hide_data(
-    input_image_path, input_file_path, steg_image_path, num_lsb, compression_level
+        input_image_path, input_file_path, steg_image_path, num_lsb, compression_level
 ):
     """Hides the data from the input file in the input image."""
     if input_image_path is None:
@@ -145,16 +145,16 @@ def recover_message_from_image(input_image, num_lsb):
     )
 
     maximum_bytes_in_image = (
-        max_bits_to_hide(steg_image, num_lsb) // 8 - file_size_tag_size
+            max_bits_to_hide(steg_image, num_lsb) // 8 - file_size_tag_size
     )
     if bytes_to_recover > maximum_bytes_in_image:
         raise ValueError(
-            f"This image appears to be corrupted.\n"
+            "This image appears to be corrupted.\n"
             + f"It claims to hold {bytes_to_recover} B, "
             + f"but can only hold {maximum_bytes_in_image} B with {num_lsb} LSBs"
         )
 
-    log.debug(f"Files read".ljust(30) + f" in {time() - start:.2f}s")
+    log.debug("Files read".ljust(30) + f" in {time() - start:.2f}s")
 
     start = time()
     data = lsb_deinterleave_list(
@@ -178,7 +178,7 @@ def recover_data(steg_image_path, output_file_path, num_lsb):
     start = time()
     output_file.write(data)
     output_file.close()
-    log.debug(f"Output file written".ljust(30) + f" in {time() - start:.2f}s")
+    log.debug("Output file written".ljust(30) + f" in {time() - start:.2f}s")
 
 
 def analysis(image_file_path, input_file_path, num_lsb):
@@ -195,7 +195,7 @@ def analysis(image_file_path, input_file_path, num_lsb):
 
     if input_file_path is not None:
         print(
-            f"Size of input file:".ljust(30) + f" {get_filesize(input_file_path)} B\n"
+            "Size of input file:".ljust(30) + f" {get_filesize(input_file_path)} B\n"
         )
 
-    print(f"File size tag:".ljust(30) + f" {bytes_in_max_file_size(image, num_lsb)} B")
+    print("File size tag:".ljust(30) + f" {bytes_in_max_file_size(image, num_lsb)} B")
