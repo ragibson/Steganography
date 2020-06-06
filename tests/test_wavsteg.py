@@ -8,9 +8,7 @@ import wave
 
 
 class TestWavSteg(unittest.TestCase):
-    def write_random_wav(
-        self, filename, num_channels, sample_width, framerate, num_frames
-    ):
+    def write_random_wav(self, filename, num_channels, sample_width, framerate, num_frames):
         if sample_width != 1 and sample_width != 2:
             # WavSteg doesn't support higher sample widths
             raise ValueError("File has an unsupported bit-depth")
@@ -34,7 +32,7 @@ class TestWavSteg(unittest.TestCase):
         with open(filename, "wb") as file:
             file.write(os.urandom(num_bytes))
 
-    def check_random_interleaving(self, byte_depth=1, num_trials=64, filename_length=5):
+    def check_random_interleaving(self, byte_depth=1, num_trials=256, filename_length=5):
         filename = "".join(
             choice(string.ascii_lowercase) for _ in range(filename_length)
         )
@@ -77,7 +75,7 @@ class TestWavSteg(unittest.TestCase):
                 raise e
 
             with open(payload_input_filename, "rb") as input_file, open(
-                payload_output_filename, "rb"
+                    payload_output_filename, "rb"
             ) as output_file:
                 input_payload_data = input_file.read()
                 output_payload_data = output_file.read()

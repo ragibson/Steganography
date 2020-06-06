@@ -24,7 +24,7 @@ class TestBitManipulation(unittest.TestCase):
         )
         self.assertEqual(truncated_decode, payload)
 
-    def check_random_interleaving(self, byte_depth=1, num_trials=256):
+    def check_random_interleaving(self, byte_depth=1, num_trials=1024):
         np.random.seed(0)
         for _ in range(num_trials):
             carrier_len = np.random.randint(1, 16384)

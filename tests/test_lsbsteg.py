@@ -18,7 +18,7 @@ class TestLSBSteg(unittest.TestCase):
         with open(filename, "wb") as file:
             file.write(os.urandom(num_bytes))
 
-    def test_random_interleaving(self, num_trials=64, filename_length=5):
+    def test_random_interleaving(self, num_trials=256, filename_length=5):
         filename = "".join(
             choice(string.ascii_lowercase) for _ in range(filename_length)
         )
