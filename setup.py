@@ -12,7 +12,7 @@ setup(
     author="Ryan Gibson",
     author_email="ryanalexandergibson@gmail.com",
     name="stego_lsb",
-    version="1.3.2",
+    version="1.3.1",
     description="stego lsb",
     keywords="stego lsb",
     license="MIT",
@@ -38,7 +38,6 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3 :: Only",
     ],
 )
