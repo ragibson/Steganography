@@ -5,8 +5,10 @@ from setuptools import find_packages, setup
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-requirements = ["Pillow>=5.3.0", "numpy>=1.15.4", "Click>=7.0"]
-
+requirements = ["Pillow>=5.3.0",
+                "numpy>=1.15.4,<1.22.0; python_version<'3.8'",
+                "numpy>=1.15.4; python_version>='3.8'",
+                "Click>=7.0"]
 
 setup(
     author="Ryan Gibson",
