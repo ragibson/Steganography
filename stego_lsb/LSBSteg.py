@@ -121,7 +121,10 @@ def hide_data(
     image, input_file = prepare_hide(input_image_path, input_file_path)
     image = hide_message_in_image(image, input_file.read(), num_lsb)
     input_file.close()
-    image.save(steg_image_path, compress_level=compression_level, save_all=image.is_animated)
+
+    # just in case is_animated is not defined, as suggested by the Pillow documentation
+    is_animated = getattr(image, "is_animated", False)
+    image.save(steg_image_path, compress_level=compression_level, save_all=is_animated)
 
 
 def recover_message_from_image(input_image, num_lsb):
