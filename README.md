@@ -46,14 +46,14 @@ running `stegolsb test` should produce output similar to
     Progress: [################################]
     ----------------------------------------
     | # LSBs | Encode Rate  | Decode rate  |
-    | 1      | 40.1   MB/s  | 56.3   MB/s  |
+    | 1      | 60.6   MB/s  | 95.9   MB/s  |
     | 2      | 56.6   MB/s  | 52.7   MB/s  |
     | 3      | 82.5   MB/s  | 77.4   MB/s  |
     | 4      | 112.4  MB/s  | 105.9  MB/s  |
     | 5      | 135.9  MB/s  | 129.8  MB/s  |
     | 6      | 159.9  MB/s  | 152.4  MB/s  |
     | 7      | 181.7  MB/s  | 174.6  MB/s  |
-    | 8      | 372.8  MB/s  | 902.8  MB/s  |
+    | 8      | 372.8  MB/s  | 1121.8 MB/s  |
     ----------------------------------------
 
 <a name = "WavSteg"></a>
