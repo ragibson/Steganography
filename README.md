@@ -1,5 +1,7 @@
 # Steganography
 
+![Steganography illustration](readme_illustration.png)
+
 # Table of Contents
   * [Installation](#Installation)
   * [Byte Sequence Manipulation](#ByteSequenceManipulation)
