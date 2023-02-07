@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 """
-    stego_lsb.cli
-    ~~~~~~~~~~~~~
+stego_lsb.cli
+~~~~~~~~~~~~~
 
-    This module provides the command line interface for:
-        - hiding and recovering data in .wav files
-        - hiding and recovering data in bitmap (.bmp and .png)
-          files
-        - detecting images which have modified using the
-          LSB methods.
+This module provides the command line interface for:
+    - hiding and recovering data in .wav files
+    - hiding and recovering data in bitmap (.bmp and .png)
+      files
+    - detecting images which have modified using the
+      LSB methods.
 
-    :copyright: (c) 2015 by Ryan Gibson, see AUTHORS.md for more details.
-    :license: MIT License, see LICENSE.md for more details.
+TODO: should this be refactored more? I am trusting that @sh4nks implemented this well.
+
+:copyright: (c) 2015 by Ryan Gibson, see AUTHORS.md for more details.
+:license: MIT License, see LICENSE.md for more details.
 """
-import logging
-
-import click
-
 from stego_lsb import LSBSteg, StegDetect, WavSteg, bit_manipulation
+import click
+import logging
 
 # enable logging output
 logging.basicConfig(format="%(message)s", level=logging.INFO)
@@ -27,7 +27,7 @@ log.setLevel(logging.DEBUG)
 
 @click.group()
 @click.version_option()
-def main(args=None):
+def main() -> None:
     """Console script for stegolsb."""
 
 
@@ -67,8 +67,16 @@ def main(args=None):
 )
 @click.pass_context
 def steglsb(
-        ctx, hide, recover, analyze, input_fp, secret_fp, output_fp, lsb_count, compression
-):
+    ctx: click.Context,
+    hide: bool,
+    recover: bool,
+    analyze: bool,
+    input_fp: str,
+    secret_fp: str,
+    output_fp: str,
+    lsb_count: int,
+    compression: int,
+) -> None:
     """Hides or recovers data in and from an image"""
     try:
         if analyze:
@@ -97,7 +105,7 @@ def steglsb(
     help="How many LSBs to display",
 )
 @click.pass_context
-def stegdetect(ctx, image_path, lsb_count):
+def stegdetect(ctx: click.Context, image_path: str, lsb_count: int) -> None:
     """Shows the n least significant bits of image"""
     if image_path:
         StegDetect.show_lsb(image_path, lsb_count)
@@ -129,7 +137,16 @@ def stegdetect(ctx, image_path, lsb_count):
     type=int,
 )
 @click.pass_context
-def wavsteg(ctx, hide, recover, input_fp, secret_fp, output_fp, lsb_count, num_bytes):
+def wavsteg(
+    ctx: click.Context,
+    hide: bool,
+    recover: bool,
+    input_fp: str,
+    secret_fp: str,
+    output_fp: str,
+    lsb_count: int,
+    num_bytes: int,
+) -> None:
     """Hides or recovers data in and from a sound file"""
     try:
         if hide:
@@ -144,6 +161,6 @@ def wavsteg(ctx, hide, recover, input_fp, secret_fp, output_fp, lsb_count, num_b
 
 
 @main.command()
-def test():
+def test() -> None:
     """Runs a performance test and verifies decoding consistency"""
     bit_manipulation.test()

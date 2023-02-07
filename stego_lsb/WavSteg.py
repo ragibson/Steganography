@@ -9,18 +9,18 @@
     :copyright: (c) 2015 by Ryan Gibson, see AUTHORS.md for more details.
     :license: MIT License, see LICENSE.md for more details.
 """
+from stego_lsb.bit_manipulation import lsb_deinterleave_bytes, lsb_interleave_bytes
+from time import time
 import logging
 import math
 import os
 import wave
-from time import time
 
-from stego_lsb.bit_manipulation import lsb_deinterleave_bytes, lsb_interleave_bytes
 
 log = logging.getLogger(__name__)
 
 
-def hide_data(sound_path, file_path, output_path, num_lsb):
+def hide_data(sound_path: str, file_path: str, output_path: str, num_lsb: int) -> None:
     """Hide data from the file at file_path in the sound file at sound_path"""
     if sound_path is None:
         raise ValueError("WavSteg hiding requires an input sound file path")
@@ -74,7 +74,9 @@ def hide_data(sound_path, file_path, output_path, num_lsb):
     log.debug("Output wav written".ljust(30) + f" in {time() - start:.2f}s")
 
 
-def recover_data(sound_path, output_path, num_lsb, bytes_to_recover):
+def recover_data(
+    sound_path: str, output_path: str, num_lsb: int, bytes_to_recover: int
+) -> None:
     """Recover data from the file at sound_path to the file at output_path"""
     if sound_path is None:
         raise ValueError("WavSteg recovery requires an input sound file path")
