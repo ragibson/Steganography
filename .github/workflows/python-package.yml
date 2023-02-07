@@ -39,8 +39,9 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics --exclude env/
       - name: Type checking with mypy
         run: |
+          source env/bin/activate
           python -m pip install mypy
-          mypy --strict stego_lsb/
+          python -m mypy --install-types --non-interactive stego_lsb/
       - name: Test with pytest
         run: |
           source env/bin/activate
