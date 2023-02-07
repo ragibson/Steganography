@@ -16,7 +16,7 @@ from stego_lsb.bit_manipulation import (
     roundup,
 )
 from time import time
-from typing import Tuple, IO, Union, cast
+from typing import Tuple, IO, Union, List, cast
 import logging
 import numpy as np
 import os
@@ -26,9 +26,9 @@ log = logging.getLogger(__name__)
 
 
 def _str_to_bytes(
-    x: Union[bytes, str],
-    charset: str = sys.getdefaultencoding(),
-    errors: str = "strict",
+        x: Union[bytes, str],
+        charset: str = sys.getdefaultencoding(),
+        errors: str = "strict",
 ) -> bytes:
     if x is None:
         return None
@@ -42,7 +42,7 @@ def _str_to_bytes(
 
 
 def prepare_hide(
-    input_image_path: str, input_file_path: str
+        input_image_path: str, input_file_path: str
 ) -> Tuple[Image.Image, IO[bytes]]:
     """Prepare files for reading and writing for hiding data."""
     image = Image.open(input_image_path)
@@ -51,7 +51,7 @@ def prepare_hide(
 
 
 def prepare_recover(
-    steg_image_path: str, output_file_path: str
+        steg_image_path: str, output_file_path: str
 ) -> Tuple[Image.Image, IO[bytes]]:
     """Prepare files for reading and writing for recovering data."""
     steg_image = Image.open(steg_image_path)
@@ -77,7 +77,7 @@ def bytes_in_max_file_size(image: Image.Image, num_lsb: int) -> int:
 
 
 def hide_message_in_image(
-    input_image: Image.Image, message: Union[str, bytes], num_lsb: int
+        input_image: Image.Image, message: Union[str, bytes], num_lsb: int
 ) -> Image.Image:
     """Hides the message in the input image and returns the modified
     image object.
@@ -113,18 +113,18 @@ def hide_message_in_image(
     start = time()
     # PIL expects a sequence of tuples, one per pixel TODO: this expression is too complicated for typing to handle?
     image.putdata(
-        cast(list[int], list(zip(*[iter(flattened_color_data)] * num_channels)))
+        cast(List[int], list(zip(*[iter(flattened_color_data)] * num_channels)))
     )
     log.debug("Image overwritten".ljust(30) + f" in {time() - start:.2f}s")
     return image
 
 
 def hide_data(
-    input_image_path: str,
-    input_file_path: str,
-    steg_image_path: str,
-    num_lsb: int,
-    compression_level: int,
+        input_image_path: str,
+        input_file_path: str,
+        steg_image_path: str,
+        num_lsb: int,
+        compression_level: int,
 ) -> None:
     """Hides the data from the input file in the input image."""
     if input_image_path is None:
@@ -164,7 +164,7 @@ def recover_message_from_image(input_image: Image.Image, num_lsb: int) -> bytes:
     )
 
     maximum_bytes_in_image = (
-        max_bits_to_hide(steg_image, num_lsb) // 8 - file_size_tag_size
+            max_bits_to_hide(steg_image, num_lsb) // 8 - file_size_tag_size
     )
     if bytes_to_recover > maximum_bytes_in_image:
         raise ValueError(
