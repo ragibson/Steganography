@@ -16,7 +16,7 @@ setup(
     author="Ryan Gibson",
     author_email="ryanalexandergibson@gmail.com",
     name="stego_lsb",
-    version="1.4.0",
+    version="1.4.1",
     description="stego lsb",
     keywords="stego lsb",
     license="MIT",
@@ -28,6 +28,7 @@ setup(
         [console_scripts]
         stegolsb=stego_lsb.cli:main
     """,
+    package_data={"stego_lsb": ["py.typed"]},
     include_package_data=True,
     packages=find_packages(include=["stego_lsb"]),
     zip_safe=False,
