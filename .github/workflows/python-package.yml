@@ -41,8 +41,8 @@ jobs:
         if: matrix.python-version != 3.7
         run: |
           source env/bin/activate
-          python -m pip install mypy
-          python -m mypy --install-types --non-interactive stego_lsb/
+          python -m pip install mypy types-setuptools
+          python -m mypy --install-types --non-interactive
       - name: Test with pytest
         run: |
           source env/bin/activate
