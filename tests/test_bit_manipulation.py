@@ -4,7 +4,9 @@ import unittest
 
 
 class TestBitManipulation(unittest.TestCase):
-    def assertConsistentInterleaving(self, carrier, payload, num_lsb, byte_depth=1):
+    def assertConsistentInterleaving(
+        self, carrier: bytes, payload: bytes, num_lsb: int, byte_depth: int = 1
+    ) -> None:
         num_payload_bits = 8 * len(payload)
 
         encoded = lsb_interleave_bytes(carrier, payload, num_lsb, byte_depth=byte_depth)
@@ -24,7 +26,9 @@ class TestBitManipulation(unittest.TestCase):
         )
         self.assertEqual(truncated_decode, payload)
 
-    def check_random_interleaving(self, byte_depth=1, num_trials=1024):
+    def check_random_interleaving(
+        self, byte_depth: int = 1, num_trials: int = 1024
+    ) -> None:
         np.random.seed(0)
         for _ in range(num_trials):
             carrier_len = np.random.randint(1, 16384)
@@ -36,16 +40,16 @@ class TestBitManipulation(unittest.TestCase):
                 carrier, payload, num_lsb, byte_depth=byte_depth
             )
 
-    def test_interleaving_consistency_8bit(self):
+    def test_interleaving_consistency_8bit(self) -> None:
         self.check_random_interleaving(byte_depth=1)
 
-    def test_interleaving_consistency_16bit(self):
+    def test_interleaving_consistency_16bit(self) -> None:
         self.check_random_interleaving(byte_depth=2)
 
-    def test_interleaving_consistency_32bit(self):
+    def test_interleaving_consistency_32bit(self) -> None:
         self.check_random_interleaving(byte_depth=4)
 
-    def test_interleaving_consistency_64bit(self):
+    def test_interleaving_consistency_64bit(self) -> None:
         self.check_random_interleaving(byte_depth=8)
 
 

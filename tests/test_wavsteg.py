@@ -3,12 +3,20 @@ import os
 from random import choice
 from stego_lsb.WavSteg import hide_data, recover_data
 import string
+from typing import Any, Type
 import unittest
 import wave
 
 
 class TestWavSteg(unittest.TestCase):
-    def write_random_wav(self, filename, num_channels, sample_width, framerate, num_frames):
+    def write_random_wav(
+        self,
+        filename: str,
+        num_channels: int,
+        sample_width: int,
+        framerate: int,
+        num_frames: int,
+    ) -> None:
         if sample_width != 1 and sample_width != 2:
             # WavSteg doesn't support higher sample widths
             raise ValueError("File has an unsupported bit-depth")
@@ -18,6 +26,7 @@ class TestWavSteg(unittest.TestCase):
         file.setsampwidth(sample_width)
         file.setframerate(framerate)
 
+        dtype: Type[np.unsignedinteger[Any]]
         if sample_width == 1:
             dtype = np.uint8
         else:
@@ -26,13 +35,16 @@ class TestWavSteg(unittest.TestCase):
         data = np.random.randint(
             0, 2 ** (8 * sample_width), dtype=dtype, size=num_frames * num_channels
         )
-        file.writeframes(data)
+        # note: typing does not recognize that "writeframes() accepts any bytes-like object" (see documentation)
+        file.writeframes(data)  # type: ignore
 
-    def write_random_file(self, filename, num_bytes):
+    def write_random_file(self, filename: str, num_bytes: int) -> None:
         with open(filename, "wb") as file:
             file.write(os.urandom(num_bytes))
 
-    def check_random_interleaving(self, byte_depth=1, num_trials=256, filename_length=5):
+    def check_random_interleaving(
+        self, byte_depth: int = 1, num_trials: int = 256, filename_length: int = 5
+    ) -> None:
         filename = "".join(
             choice(string.ascii_lowercase) for _ in range(filename_length)
         )
@@ -75,7 +87,7 @@ class TestWavSteg(unittest.TestCase):
                 raise e
 
             with open(payload_input_filename, "rb") as input_file, open(
-                    payload_output_filename, "rb"
+                payload_output_filename, "rb"
             ) as output_file:
                 input_payload_data = input_file.read()
                 output_payload_data = output_file.read()
@@ -87,10 +99,10 @@ class TestWavSteg(unittest.TestCase):
 
             self.assertEqual(input_payload_data, output_payload_data)
 
-    def test_consistency_8bit(self):
+    def test_consistency_8bit(self) -> None:
         self.check_random_interleaving(byte_depth=1)
 
-    def test_consistency_16bit(self):
+    def test_consistency_16bit(self) -> None:
         self.check_random_interleaving(byte_depth=2)
 
 

@@ -9,16 +9,18 @@ import unittest
 
 
 class TestLSBSteg(unittest.TestCase):
-    def write_random_image(self, filename, width, height):
+    def write_random_image(self, filename: str, width: int, height: int) -> None:
         image_data = np.random.randint(0, 256, size=(height, width, 3), dtype=np.uint8)
         image = Image.fromarray(image_data)
         image.save(filename)
 
-    def write_random_file(self, filename, num_bytes):
+    def write_random_file(self, filename: str, num_bytes: int) -> None:
         with open(filename, "wb") as file:
             file.write(os.urandom(num_bytes))
 
-    def test_random_interleaving(self, num_trials=256, filename_length=5):
+    def test_random_interleaving(
+        self, num_trials: int = 256, filename_length: int = 5
+    ) -> None:
         filename = "".join(
             choice(string.ascii_lowercase) for _ in range(filename_length)
         )
@@ -61,7 +63,7 @@ class TestLSBSteg(unittest.TestCase):
                 raise e
 
             with open(payload_input_filename, "rb") as input_file, open(
-                    payload_output_filename, "rb"
+                payload_output_filename, "rb"
             ) as output_file:
                 input_payload_data = input_file.read()
                 output_payload_data = output_file.read()
