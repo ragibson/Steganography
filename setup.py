@@ -8,7 +8,8 @@ with open("README.md") as readme_file:
 requirements = [
     "Pillow>=5.3.0",
     "numpy>=1.15.4,<1.22.0; python_version<'3.8'",
-    "numpy>=1.15.4; python_version>='3.8'",
+    "numpy>=1.15.4,<1.25.0; python_version>='3.8' and python_version<'3.9'",
+    "numpy>=1.15.4; python_version>='3.9'",
     "Click>=7.0",
 ]
 
