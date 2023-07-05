@@ -7,7 +7,6 @@ with open("README.md") as readme_file:
 
 requirements = [
     "Pillow>=5.3.0",
-    "numpy>=1.15.4,<1.22.0; python_version<'3.8'",
     "numpy>=1.15.4,<1.25.0; python_version>='3.8' and python_version<'3.9'",
     "numpy>=1.15.4; python_version>='3.9'",
     "Click>=7.0",
@@ -16,8 +15,8 @@ requirements = [
 setup(
     author="Ryan Gibson",
     author_email="ryanalexandergibson@gmail.com",
-    name="stego_lsb",
-    version="1.4.2",
+    name="stego-lsb",
+    version="1.4.3",
     description="stego lsb",
     keywords="stego lsb",
     license="MIT",
@@ -33,14 +32,13 @@ setup(
     include_package_data=True,
     packages=find_packages(include=["stego_lsb"]),
     zip_safe=False,
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Natural Language :: English",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
