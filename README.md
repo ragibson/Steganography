@@ -3,13 +3,12 @@
 ![Steganography illustration](readme_illustration.png)
 
 # Table of Contents
-  * [Installation](#Installation)
-  * [Byte Sequence Manipulation](#ByteSequenceManipulation)
-  * [WavSteg](#WavSteg)
-  * [LSBSteg](#LSBSteg)
-  * [StegDetect](#StegDetect)
+  * [Installation](#installation)
+  * [Byte Sequence Manipulation](#byte-sequence-manipulation)
+  * [WavSteg](#wavsteg)
+  * [LSBSteg](#lsbsteg)
+  * [StegDetect](#stegdetect)
 
-<a name = "Installation"></a>
 ## Installation
 This project is on [PyPI](https://pypi.org/project/stego-lsb/) and can be
 installed with
@@ -22,7 +21,6 @@ Alternatively, you can install it from this repository directly:
     cd Steganography
     python3 setup.py install
 
-<a name = "ByteSequenceManipulation"></a>
 ## Byte Sequence Manipulation
 bit_manipulation provides the ability to (quickly) interleave the bytes of a
 payload directly in the least significant bits of a carrier byte sequence.
@@ -58,7 +56,6 @@ running `stegolsb test` should produce output similar to
     | 8      | 372.8  MB/s  | 1121.8 MB/s  |
     ----------------------------------------
 
-<a name = "WavSteg"></a>
 ## WavSteg
 WavSteg uses least significant bit steganography to hide a file in the samples
 of a .wav file.
@@ -119,7 +116,6 @@ Example:
     Recovered 5589889 bytes        in 0.18s
     Written output file            in 0.00s
 
-<a name = "LSBSteg"></a>
 ## LSBSteg
 LSBSteg uses least significant bit steganography to hide a file in the color
 information of an RGB image (.bmp or .png).
@@ -182,7 +178,6 @@ the result to the output file, producing output similar to
     1566763 bytes recovered        in 0.28s
     Output file written            in 0.00s
 
-<a name = "StegDetect"></a>
 ## StegDetect
 StegDetect provides one method for detecting simple steganography in images.
 
