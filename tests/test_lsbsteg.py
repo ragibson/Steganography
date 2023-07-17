@@ -18,12 +18,8 @@ class TestLSBSteg(unittest.TestCase):
         with open(filename, "wb") as file:
             file.write(os.urandom(num_bytes))
 
-    def test_random_interleaving(
-        self, num_trials: int = 256, filename_length: int = 5
-    ) -> None:
-        filename = "".join(
-            choice(string.ascii_lowercase) for _ in range(filename_length)
-        )
+    def test_random_interleaving(self, num_trials: int = 256, filename_length: int = 5) -> None:
+        filename = "".join(choice(string.ascii_lowercase) for _ in range(filename_length))
         png_input_filename = filename + ".png"
         payload_input_filename = filename + ".txt"
         png_output_filename = filename + "_steg.png"
@@ -35,9 +31,7 @@ class TestLSBSteg(unittest.TestCase):
             height = np.random.randint(1, 256)
             num_lsb = np.random.randint(1, 9)
 
-            file_size_tag_length = roundup(
-                int(3 * width * height * num_lsb).bit_length() / 8
-            )
+            file_size_tag_length = roundup(int(3 * width * height * num_lsb).bit_length() / 8)
             payload_len = (3 * width * height * num_lsb - 8 * file_size_tag_length) // 8
 
             if payload_len < 0:
@@ -47,13 +41,7 @@ class TestLSBSteg(unittest.TestCase):
             self.write_random_file(payload_input_filename, num_bytes=payload_len)
 
             try:
-                hide_data(
-                    png_input_filename,
-                    payload_input_filename,
-                    png_output_filename,
-                    num_lsb,
-                    compression_level=1,
-                )
+                hide_data(png_input_filename, payload_input_filename, png_output_filename, num_lsb, compression_level=1)
                 recover_data(png_output_filename, payload_output_filename, num_lsb)
             except ValueError as e:
                 os.remove(png_input_filename)
@@ -62,9 +50,7 @@ class TestLSBSteg(unittest.TestCase):
                 os.remove(payload_output_filename)
                 raise e
 
-            with open(payload_input_filename, "rb") as input_file, open(
-                payload_output_filename, "rb"
-            ) as output_file:
+            with open(payload_input_filename, "rb") as input_file, open(payload_output_filename, "rb") as output_file:
                 input_payload_data = input_file.read()
                 output_payload_data = output_file.read()
 

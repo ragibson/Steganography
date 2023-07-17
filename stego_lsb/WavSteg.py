@@ -16,7 +16,6 @@ import math
 import os
 import wave
 
-
 log = logging.getLogger(__name__)
 
 
@@ -51,19 +50,14 @@ def hide_data(sound_path: str, file_path: str, output_path: str, num_lsb: int) -
 
     if file_size > max_bytes_to_hide:
         required_lsb = math.ceil(file_size * 8 / num_samples)
-        raise ValueError(
-            "Input file too large to hide, "
-            f"requires {required_lsb} LSBs, using {num_lsb}"
-        )
+        raise ValueError(f"Input file too large to hide, requires {required_lsb} LSBs, using {num_lsb}")
 
     if sample_width != 1 and sample_width != 2:
         # Python's wave module doesn't support higher sample widths
         raise ValueError("File has an unsupported bit-depth")
 
     start = time()
-    sound_frames = lsb_interleave_bytes(
-        sound_frames, data, num_lsb, byte_depth=sample_width
-    )
+    sound_frames = lsb_interleave_bytes(sound_frames, data, num_lsb, byte_depth=sample_width)
     log.debug(f"{file_size} bytes hidden".ljust(30) + f" in {time() - start:.2f}s")
 
     start = time()
@@ -74,9 +68,7 @@ def hide_data(sound_path: str, file_path: str, output_path: str, num_lsb: int) -
     log.debug("Output wav written".ljust(30) + f" in {time() - start:.2f}s")
 
 
-def recover_data(
-    sound_path: str, output_path: str, num_lsb: int, bytes_to_recover: int
-) -> None:
+def recover_data(sound_path: str, output_path: str, num_lsb: int, bytes_to_recover: int) -> None:
     """Recover data from the file at sound_path to the file at output_path"""
     if sound_path is None:
         raise ValueError("WavSteg recovery requires an input sound file path")
@@ -99,12 +91,8 @@ def recover_data(
         raise ValueError("File has an unsupported bit-depth")
 
     start = time()
-    data = lsb_deinterleave_bytes(
-        sound_frames, 8 * bytes_to_recover, num_lsb, byte_depth=sample_width
-    )
-    log.debug(
-        f"Recovered {bytes_to_recover} bytes".ljust(30) + f" in {time() - start:.2f}s"
-    )
+    data = lsb_deinterleave_bytes(sound_frames, 8 * bytes_to_recover, num_lsb, byte_depth=sample_width)
+    log.debug(f"Recovered {bytes_to_recover} bytes".ljust(30) + f" in {time() - start:.2f}s")
 
     start = time()
     output_file = open(output_path, "wb+")

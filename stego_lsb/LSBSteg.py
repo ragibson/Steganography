@@ -24,11 +24,7 @@ import sys
 log = logging.getLogger(__name__)
 
 
-def _str_to_bytes(
-    x: Union[bytes, str],
-    charset: str = sys.getdefaultencoding(),
-    errors: str = "strict",
-) -> bytes:
+def _str_to_bytes(x: Union[bytes, str], charset: str = sys.getdefaultencoding(), errors: str = "strict") -> bytes:
     if x is None:
         return None
     if isinstance(x, (bytes, bytearray, memoryview)):  # noqa
@@ -40,18 +36,14 @@ def _str_to_bytes(
     raise TypeError("Expected bytes")
 
 
-def prepare_hide(
-    input_image_path: str, input_file_path: str
-) -> Tuple[Image.Image, IO[bytes]]:
+def prepare_hide(input_image_path: str, input_file_path: str) -> Tuple[Image.Image, IO[bytes]]:
     """Prepare files for reading and writing for hiding data."""
     image = Image.open(input_image_path)
     input_file = open(input_file_path, "rb")
     return image, input_file
 
 
-def prepare_recover(
-    steg_image_path: str, output_file_path: str
-) -> Tuple[Image.Image, IO[bytes]]:
+def prepare_recover(steg_image_path: str, output_file_path: str) -> Tuple[Image.Image, IO[bytes]]:
     """Prepare files for reading and writing for recovering data."""
     steg_image = Image.open(steg_image_path)
     output_file = open(output_file_path, "wb+")
@@ -75,9 +67,7 @@ def bytes_in_max_file_size(image: Image.Image, num_lsb: int) -> int:
     return roundup(max_bits_to_hide(image, num_lsb).bit_length() / 8)
 
 
-def hide_message_in_image(
-    input_image: Image.Image, message: Union[str, bytes], num_lsb: int
-) -> Image.Image:
+def hide_message_in_image(input_image: Image.Image, message: Union[str, bytes], num_lsb: int) -> Image.Image:
     """Hides the message in the input image and returns the modified
     image object.
     """
@@ -93,17 +83,13 @@ def hide_message_in_image(
 
     # We add the size of the input file to the beginning of the payload.
     message_size = len(message)
-    file_size_tag = message_size.to_bytes(
-        bytes_in_max_file_size(image, num_lsb), byteorder=sys.byteorder
-    )
+    file_size_tag = message_size.to_bytes(bytes_in_max_file_size(image, num_lsb), byteorder=sys.byteorder)
     data = file_size_tag + _str_to_bytes(message)
     log.debug("Files read".ljust(30) + f" in {time() - start:.2f}s")
 
     if 8 * len(data) > max_bits_to_hide(image, num_lsb):
-        raise ValueError(
-            f"Only able to hide {max_bits_to_hide(image, num_lsb) // 8} bytes "
-            + f"in this image with {num_lsb} LSBs, but {len(data)} bytes were requested"
-        )
+        raise ValueError(f"Only able to hide {max_bits_to_hide(image, num_lsb) // 8} bytes in "
+                         f"this image with {num_lsb} LSBs, but {len(data)} bytes were requested")
 
     start = time()
     flattened_color_data = lsb_interleave_list(flattened_color_data, data, num_lsb)
@@ -111,20 +97,13 @@ def hide_message_in_image(
 
     start = time()
     # PIL expects a sequence of tuples, one per pixel TODO: this expression is too complicated for typing to handle?
-    image.putdata(
-        cast(List[int], list(zip(*[iter(flattened_color_data)] * num_channels)))
-    )
+    image.putdata(cast(List[int], list(zip(*[iter(flattened_color_data)] * num_channels))))
     log.debug("Image overwritten".ljust(30) + f" in {time() - start:.2f}s")
     return image
 
 
-def hide_data(
-    input_image_path: str,
-    input_file_path: str,
-    steg_image_path: str,
-    num_lsb: int,
-    compression_level: int,
-) -> None:
+def hide_data(input_image_path: str, input_file_path: str, steg_image_path: str, num_lsb: int,
+              compression_level: int) -> None:
     """Hides the data from the input file in the input image."""
     if input_image_path is None:
         raise ValueError("LSBSteg hiding requires an input image file path")
@@ -156,31 +135,18 @@ def recover_message_from_image(input_image: Image.Image, num_lsb: int) -> bytes:
     tag_bit_height = roundup(8 * file_size_tag_size / num_lsb)
 
     bytes_to_recover = int.from_bytes(
-        lsb_deinterleave_list(
-            color_data[:tag_bit_height], 8 * file_size_tag_size, num_lsb
-        ),
-        byteorder=sys.byteorder,
-    )
+        lsb_deinterleave_list(color_data[:tag_bit_height], 8 * file_size_tag_size, num_lsb), byteorder=sys.byteorder)
 
-    maximum_bytes_in_image = (
-        max_bits_to_hide(steg_image, num_lsb) // 8 - file_size_tag_size
-    )
+    maximum_bytes_in_image = (max_bits_to_hide(steg_image, num_lsb) // 8 - file_size_tag_size)
     if bytes_to_recover > maximum_bytes_in_image:
-        raise ValueError(
-            "This image appears to be corrupted.\n"
-            + f"It claims to hold {bytes_to_recover} B, "
-            + f"but can only hold {maximum_bytes_in_image} B with {num_lsb} LSBs"
-        )
+        raise ValueError(f"This image appears to be corrupted.\nIt claims to hold {bytes_to_recover} B, "
+                         f"but can only hold {maximum_bytes_in_image} B with {num_lsb} LSBs")
 
     log.debug("Files read".ljust(30) + f" in {time() - start:.2f}s")
 
     start = time()
-    data = lsb_deinterleave_list(
-        color_data, 8 * (bytes_to_recover + file_size_tag_size), num_lsb
-    )[file_size_tag_size:]
-    log.debug(
-        f"{bytes_to_recover} bytes recovered".ljust(30) + f" in {time() - start:.2f}s"
-    )
+    data = lsb_deinterleave_list(color_data, 8 * (bytes_to_recover + file_size_tag_size), num_lsb)[file_size_tag_size:]
+    log.debug(f"{bytes_to_recover} bytes recovered".ljust(30) + f" in {time() - start:.2f}s")
     return data
 
 
@@ -205,11 +171,8 @@ def analysis(image_file_path: str, input_file_path: str, num_lsb: int) -> None:
         raise ValueError("LSBSteg analysis requires an input image file path")
 
     image = Image.open(image_file_path)
-    print(
-        f"Image resolution: ({image.size[0]}, {image.size[1]})\n"
-        + f"Using {num_lsb} LSBs, we can hide:".ljust(30)
-        + f" {max_bits_to_hide(image, num_lsb) // 8} B"
-    )
+    print(f"Image resolution: ({image.size[0]}, {image.size[1]})\n"
+          + f"Using {num_lsb} LSBs, we can hide:".ljust(30) + f" {max_bits_to_hide(image, num_lsb) // 8} B")
 
     if input_file_path is not None:
         print("Size of input file:".ljust(30) + f" {get_filesize(input_file_path)} B\n")

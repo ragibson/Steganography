@@ -16,7 +16,6 @@ from typing import cast, Tuple, Iterable
 import logging
 import os
 
-
 log = logging.getLogger(__name__)
 
 
@@ -43,7 +42,3 @@ def show_lsb(image_path: str, n: int) -> None:
     log.debug(f"Runtime: {time() - start:.2f}s")
     file_name, file_extension = os.path.splitext(image_path)
     image.save(file_name + "_{}LSBs".format(n) + file_extension)
-
-
-if __name__ == "__main__":
-    show_lsb("/home/ryan/Desktop/featured-improve-test-taking.png", 1)
