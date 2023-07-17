@@ -36,10 +36,10 @@ class TestWavSteg(unittest.TestCase):
 
     def check_random_interleaving(self, byte_depth: int = 1, num_trials: int = 256, filename_length: int = 5) -> None:
         filename = "".join(choice(string.ascii_lowercase) for _ in range(filename_length))
-        wav_input_filename = filename + ".wav"
-        payload_input_filename = filename + ".txt"
-        wav_output_filename = filename + "_steg.wav"
-        payload_output_filename = filename + "_recovered.txt"
+        wav_input_filename = f"{filename}.wav"
+        payload_input_filename = f"{filename}.txt"
+        wav_output_filename = f"{filename}_steg.wav"
+        payload_output_filename = f"{filename}_recovered.txt"
 
         np.random.seed(0)
         for _ in range(num_trials):

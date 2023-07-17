@@ -85,7 +85,7 @@ def hide_message_in_image(input_image: Image.Image, message: Union[str, bytes], 
     message_size = len(message)
     file_size_tag = message_size.to_bytes(bytes_in_max_file_size(image, num_lsb), byteorder=sys.byteorder)
     data = file_size_tag + _str_to_bytes(message)
-    log.debug("Files read".ljust(30) + f" in {time() - start:.2f}s")
+    log.debug(f"{'Files read':<30} in {time() - start:.2f}s")
 
     if 8 * len(data) > max_bits_to_hide(image, num_lsb):
         raise ValueError(f"Only able to hide {max_bits_to_hide(image, num_lsb) // 8} bytes in "
@@ -93,12 +93,12 @@ def hide_message_in_image(input_image: Image.Image, message: Union[str, bytes], 
 
     start = time()
     flattened_color_data = lsb_interleave_list(flattened_color_data, data, num_lsb)
-    log.debug(f"{message_size} bytes hidden".ljust(30) + f" in {time() - start:.2f}s")
+    log.debug(f"{f'{message_size} bytes hidden':<30} in {time() - start:.2f}s")
 
     start = time()
     # PIL expects a sequence of tuples, one per pixel TODO: this expression is too complicated for typing to handle?
     image.putdata(cast(List[int], list(zip(*[iter(flattened_color_data)] * num_channels))))
-    log.debug("Image overwritten".ljust(30) + f" in {time() - start:.2f}s")
+    log.debug(f"{'Image overwritten':<30} in {time() - start:.2f}s")
     return image
 
 
@@ -142,11 +142,11 @@ def recover_message_from_image(input_image: Image.Image, num_lsb: int) -> bytes:
         raise ValueError(f"This image appears to be corrupted.\nIt claims to hold {bytes_to_recover} B, "
                          f"but can only hold {maximum_bytes_in_image} B with {num_lsb} LSBs")
 
-    log.debug("Files read".ljust(30) + f" in {time() - start:.2f}s")
+    log.debug(f"{'Files read':<30} in {time() - start:.2f}s")
 
     start = time()
     data = lsb_deinterleave_list(color_data, 8 * (bytes_to_recover + file_size_tag_size), num_lsb)[file_size_tag_size:]
-    log.debug(f"{bytes_to_recover} bytes recovered".ljust(30) + f" in {time() - start:.2f}s")
+    log.debug(f"{f'{bytes_to_recover} bytes recovered':<30} in {time() - start:.2f}s")
     return data
 
 
@@ -162,7 +162,7 @@ def recover_data(steg_image_path: str, output_file_path: str, num_lsb: int) -> N
     start = time()
     output_file.write(data)
     output_file.close()
-    log.debug("Output file written".ljust(30) + f" in {time() - start:.2f}s")
+    log.debug(f"{'Output file written':<30} in {time() - start:.2f}s")
 
 
 def analysis(image_file_path: str, input_file_path: str, num_lsb: int) -> None:
@@ -172,9 +172,9 @@ def analysis(image_file_path: str, input_file_path: str, num_lsb: int) -> None:
 
     image = Image.open(image_file_path)
     print(f"Image resolution: ({image.size[0]}, {image.size[1]})\n"
-          + f"Using {num_lsb} LSBs, we can hide:".ljust(30) + f" {max_bits_to_hide(image, num_lsb) // 8} B")
+          f"{f'Using {num_lsb} LSBs, we can hide:':<30} {max_bits_to_hide(image, num_lsb) // 8} B")
 
     if input_file_path is not None:
-        print("Size of input file:".ljust(30) + f" {get_filesize(input_file_path)} B\n")
+        print(f"{'Size of input file:':<30} {get_filesize(input_file_path)} B\n")
 
-    print("File size tag:".ljust(30) + f" {bytes_in_max_file_size(image, num_lsb)} B")
+    print(f"{'File size tag:':<30} {bytes_in_max_file_size(image, num_lsb)} B")

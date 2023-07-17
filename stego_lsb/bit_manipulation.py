@@ -110,20 +110,19 @@ def test(carrier_len: int = 10 ** 7, payload_len: int = 10 ** 6) -> bool:
 
     def print_results(e_rates: List[str], d_rates: List[str]) -> None:
         print("\n" + "-" * 40)
-        row_fmt = "| {:<7}| {:<13}| {:<13}|"
-        print(row_fmt.format("# LSBs", "Encode Rate", "Decode rate"))
+        print(f"| {'# LSBs':<7}| {'Encode Rate':<13}| {'Decode rate':<13}|")
         for n, e, d in zip(range(1, 9), e_rates[1:], d_rates[1:]):
-            print(row_fmt.format(n, e, d))
+            print(f"| {n:<7}| {e:<13}| {d:<13}|")
         print("-" * 40)
 
     current_progress = 0
 
     def progress() -> None:
         nonlocal current_progress
-        print("\rProgress: [" + "#" * current_progress + "-" * (32 - current_progress) + "]", end="", flush=True)
+        print(f"\rProgress: [{'#' * current_progress}{'-' * (32 - current_progress)}]", end="", flush=True)
         current_progress += 1
 
-    print("Testing {:.1f} MB payload -> {:.1f} MB carrier...".format(payload_len / 1e6, carrier_len / 1e6))
+    print(f"Testing {payload_len / 1e6:.1f} MB payload -> {carrier_len / 1e6:.1f} MB carrier...")
     progress()
 
     carrier = os.urandom(carrier_len)
@@ -149,11 +148,11 @@ def test(carrier_len: int = 10 ** 7, payload_len: int = 10 ** 6) -> bool:
         decode_time = time() - decode_time
         progress()
 
-        encode_rates[num_lsb] = "{:<6.1f} MB/s".format((payload_len / 1e6) / encode_time)
-        decode_rates[num_lsb] = "{:<6.1f} MB/s".format((payload_len / 1e6) / decode_time)
+        encode_rates[num_lsb] = f"{(payload_len / 1e6) / encode_time:<6.1f} MB/s"
+        decode_rates[num_lsb] = f"{(payload_len / 1e6) / decode_time:<6.1f} MB/s"
 
         if decoded != payload or truncated_decode != payload:
-            print("\nTest failed at {} LSBs!".format(num_lsb))
+            print(f"\nTest failed at {num_lsb} LSBs!")
             return False
 
     print_results(encode_rates, decode_rates)
