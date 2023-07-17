@@ -9,8 +9,8 @@ import unittest
 
 
 class TestLSBSteg(unittest.TestCase):
-    def write_random_image(self, filename: str, width: int, height: int) -> None:
-        image_data = np.random.randint(0, 256, size=(height, width, 3), dtype=np.uint8)
+    def write_random_image(self, filename: str, width: int, height: int, num_channels: int) -> None:
+        image_data = np.random.randint(0, 256, size=(height, width, num_channels), dtype=np.uint8)
         image = Image.fromarray(image_data)
         image.save(filename)
 
@@ -18,7 +18,7 @@ class TestLSBSteg(unittest.TestCase):
         with open(filename, "wb") as file:
             file.write(os.urandom(num_bytes))
 
-    def test_random_interleaving(self, num_trials: int = 256, filename_length: int = 5) -> None:
+    def check_random_interleaving(self, num_trials: int = 256, filename_length: int = 5, num_channels: int = 3) -> None:
         filename = "".join(choice(string.ascii_lowercase) for _ in range(filename_length))
         png_input_filename = f"{filename}.png"
         payload_input_filename = f"{filename}.txt"
@@ -31,13 +31,13 @@ class TestLSBSteg(unittest.TestCase):
             height = np.random.randint(1, 256)
             num_lsb = np.random.randint(1, 9)
 
-            file_size_tag_length = roundup(int(3 * width * height * num_lsb).bit_length() / 8)
-            payload_len = (3 * width * height * num_lsb - 8 * file_size_tag_length) // 8
+            file_size_tag_length = roundup(int(num_channels * width * height * num_lsb).bit_length() / 8)
+            payload_len = (num_channels * width * height * num_lsb - 8 * file_size_tag_length) // 8
 
             if payload_len < 0:
                 continue
 
-            self.write_random_image(png_input_filename, width=width, height=height)
+            self.write_random_image(png_input_filename, width=width, height=height, num_channels=num_channels)
             self.write_random_file(payload_input_filename, num_bytes=payload_len)
 
             try:
@@ -60,6 +60,15 @@ class TestLSBSteg(unittest.TestCase):
             os.remove(payload_output_filename)
 
             self.assertEqual(input_payload_data, output_payload_data)
+
+    def test_rgb_steganography_consistency(self) -> None:
+        self.check_random_interleaving(num_channels=3)
+
+    def test_rgba_steganography_consistency(self) -> None:
+        self.check_random_interleaving(num_channels=4)
+
+    def test_la_steganography_consistency(self) -> None:
+        self.check_random_interleaving(num_channels=2)
 
 
 if __name__ == "__main__":
