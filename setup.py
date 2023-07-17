@@ -6,10 +6,10 @@ with open("README.md") as readme_file:
     readme = readme_file.read()
 
 requirements = [
-    "Pillow>=5.3.0",
-    "numpy>=1.15.4,<1.25.0; python_version>='3.8' and python_version<'3.9'",
-    "numpy>=1.15.4; python_version>='3.9'",
-    "Click>=7.0",
+    # TODO: remove Click restriction after release of 8.1.6 or merge of
+    #  https://github.com/pallets/click/pull/2565
+    "Click<8.1.4", "Pillow", "numpy; python_version>='3.9'",
+    "numpy>=1.15.4,<1.25.0; python_version>='3.8' and python_version<'3.9'"
 ]
 
 setup(
