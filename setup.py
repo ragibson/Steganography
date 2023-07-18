@@ -16,7 +16,7 @@ setup(
     author="Ryan Gibson",
     author_email="ryanalexandergibson@gmail.com",
     name="stego-lsb",
-    version="1.4.4",
+    version="1.5.0",
     description="stego lsb",
     keywords="stego lsb",
     license="MIT",
