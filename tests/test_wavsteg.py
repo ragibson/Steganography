@@ -55,21 +55,17 @@ class TestWavSteg(unittest.TestCase):
             try:
                 hide_data(wav_input_filename, payload_input_filename, wav_output_filename, num_lsb)
                 recover_data(wav_output_filename, payload_output_filename, num_lsb, payload_len)
+
+                with open(payload_input_filename, "rb") as input_file, open(payload_output_filename,
+                                                                            "rb") as output_file:
+                    input_payload_data = input_file.read()
+                    output_payload_data = output_file.read()
             except ValueError as e:
-                os.remove(wav_input_filename)
-                os.remove(payload_input_filename)
-                os.remove(wav_output_filename)
-                os.remove(payload_output_filename)
                 raise e
-
-            with open(payload_input_filename, "rb") as input_file, open(payload_output_filename, "rb") as output_file:
-                input_payload_data = input_file.read()
-                output_payload_data = output_file.read()
-
-            os.remove(wav_input_filename)
-            os.remove(payload_input_filename)
-            os.remove(wav_output_filename)
-            os.remove(payload_output_filename)
+            finally:
+                for fn in [wav_input_filename, payload_input_filename, wav_output_filename, payload_output_filename]:
+                    if os.path.exists(fn):
+                        os.remove(fn)
 
             self.assertEqual(input_payload_data, output_payload_data)
 
