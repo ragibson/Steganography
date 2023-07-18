@@ -15,20 +15,20 @@ class TestWavSteg(unittest.TestCase):
             # WavSteg doesn't support higher sample widths
             raise ValueError("File has an unsupported bit-depth")
 
-        file = wave.open(filename, "w")
-        file.setnchannels(num_channels)
-        file.setsampwidth(sample_width)
-        file.setframerate(framerate)
+        with wave.open(filename, "w") as file:
+            file.setnchannels(num_channels)
+            file.setsampwidth(sample_width)
+            file.setframerate(framerate)
 
-        dtype: Type[np.unsignedinteger[Any]]
-        if sample_width == 1:
-            dtype = np.uint8
-        else:
-            dtype = np.uint16
+            dtype: Type[np.unsignedinteger[Any]]
+            if sample_width == 1:
+                dtype = np.uint8
+            else:
+                dtype = np.uint16
 
-        data = np.random.randint(0, 2 ** (8 * sample_width), dtype=dtype, size=num_frames * num_channels)
-        # note: typing does not recognize that "writeframes() accepts any bytes-like object" (see documentation)
-        file.writeframes(data)  # type: ignore
+            data = np.random.randint(0, 2 ** (8 * sample_width), dtype=dtype, size=num_frames * num_channels)
+            # note: typing does not recognize that "writeframes() accepts any bytes-like object" (see documentation)
+            file.writeframes(data)  # type: ignore
 
     def write_random_file(self, filename: str, num_bytes: int) -> None:
         with open(filename, "wb") as file:

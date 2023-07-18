@@ -13,8 +13,8 @@ import unittest
 class TestLSBSteg(unittest.TestCase):
     def write_random_image(self, filename: str, width: int, height: int, num_channels: int) -> None:
         image_data = np.random.randint(0, 256, size=(height, width, num_channels), dtype=np.uint8)
-        image = Image.fromarray(image_data)
-        image.save(filename)
+        with Image.fromarray(image_data) as image:
+            image.save(filename)
 
     def write_random_file(self, filename: str, num_bytes: int) -> None:
         with open(filename, "wb") as file:
