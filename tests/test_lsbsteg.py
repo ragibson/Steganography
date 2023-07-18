@@ -1,9 +1,11 @@
 from random import choice
 import numpy as np
 import os
+
 from PIL import Image
 from stego_lsb.bit_manipulation import roundup
-from stego_lsb.LSBSteg import hide_data, recover_data
+from stego_lsb.LSBSteg import hide_data, recover_data, prepare_hide
+import pytest
 import string
 import unittest
 
@@ -18,12 +20,13 @@ class TestLSBSteg(unittest.TestCase):
         with open(filename, "wb") as file:
             file.write(os.urandom(num_bytes))
 
-    def check_random_interleaving(self, num_trials: int = 256, filename_length: int = 5, num_channels: int = 3) -> None:
+    def check_random_interleaving(self, num_trials: int = 256, filename_length: int = 5, num_channels: int = 3,
+                                  skip_storage_check: bool = False, payload_size_shift: int = 0) -> None:
         filename = "".join(choice(string.ascii_lowercase) for _ in range(filename_length))
         png_input_filename = f"{filename}.png"
-        payload_input_filename = f"{filename}.txt"
+        payload_filename = f"{filename}.txt"
         png_output_filename = f"{filename}_steg.png"
-        payload_output_filename = f"{filename}_recovered.txt"
+        recovered_data_filename = f"{filename}_recovered.txt"
 
         np.random.seed(0)
         for _ in range(num_trials):
@@ -38,26 +41,22 @@ class TestLSBSteg(unittest.TestCase):
                 continue
 
             self.write_random_image(png_input_filename, width=width, height=height, num_channels=num_channels)
-            self.write_random_file(payload_input_filename, num_bytes=payload_len)
+            self.write_random_file(payload_filename, num_bytes=payload_len + payload_size_shift)
 
             try:
-                hide_data(png_input_filename, payload_input_filename, png_output_filename, num_lsb, compression_level=1)
-                recover_data(png_output_filename, payload_output_filename, num_lsb)
+                hide_data(png_input_filename, payload_filename, png_output_filename, num_lsb, compression_level=1,
+                          skip_storage_check=skip_storage_check)
+                recover_data(png_output_filename, recovered_data_filename, num_lsb)
+
+                with open(payload_filename, "rb") as input_file, open(recovered_data_filename, "rb") as output_file:
+                    input_payload_data = input_file.read()
+                    output_payload_data = output_file.read()
             except ValueError as e:
-                os.remove(png_input_filename)
-                os.remove(payload_input_filename)
-                os.remove(png_output_filename)
-                os.remove(payload_output_filename)
                 raise e
-
-            with open(payload_input_filename, "rb") as input_file, open(payload_output_filename, "rb") as output_file:
-                input_payload_data = input_file.read()
-                output_payload_data = output_file.read()
-
-            os.remove(png_input_filename)
-            os.remove(payload_input_filename)
-            os.remove(png_output_filename)
-            os.remove(payload_output_filename)
+            finally:
+                for fn in [png_input_filename, payload_filename, png_output_filename, recovered_data_filename]:
+                    if os.path.exists(fn):
+                        os.remove(fn)
 
             self.assertEqual(input_payload_data, output_payload_data)
 
@@ -69,6 +68,20 @@ class TestLSBSteg(unittest.TestCase):
 
     def test_la_steganography_consistency(self) -> None:
         self.check_random_interleaving(num_channels=2)
+
+    def check_maximum_storage(self, num_channels: int = 3) -> None:
+        with pytest.raises(ValueError):
+            # add an extra byte onto the payload and expect failure
+            self.check_random_interleaving(num_channels=num_channels, skip_storage_check=True, payload_size_shift=1)
+
+    def test_rgb_maximum_storage(self) -> None:
+        self.check_maximum_storage(num_channels=3)
+
+    def test_rgba_maximum_storage(self) -> None:
+        self.check_maximum_storage(num_channels=4)
+
+    def test_la_maximum_storage(self) -> None:
+        self.check_maximum_storage(num_channels=2)
 
 
 if __name__ == "__main__":

@@ -56,8 +56,7 @@ def get_filesize(path: str) -> int:
 
 
 def max_bits_to_hide(image: Image.Image, num_lsb: int, num_channels: int) -> int:
-    """Returns the number of bits we're able to hide in the image using
-    num_lsb least significant bits."""
+    """Returns the number of bits we're able to hide in the image using num_lsb least significant bits."""
     # num_channels color channels per pixel, num_lsb bits per color channel.
     return int(num_channels * image.size[0] * image.size[1] * num_lsb)
 
@@ -67,10 +66,9 @@ def bytes_in_max_file_size(image: Image.Image, num_lsb: int, num_channels: int) 
     return roundup(max_bits_to_hide(image, num_lsb, num_channels).bit_length() / 8)
 
 
-def hide_message_in_image(input_image: Image.Image, message: Union[str, bytes], num_lsb: int) -> Image.Image:
-    """Hides the message in the input image and returns the modified
-    image object.
-    """
+def hide_message_in_image(input_image: Image.Image, message: Union[str, bytes], num_lsb: int,
+                          skip_storage_check: bool = False) -> Image.Image:
+    """Hides the message in the input image and returns the modified image object."""
     start = time()
     # in some cases the image might already be opened
     if isinstance(input_image, Image.Image):
@@ -87,7 +85,7 @@ def hide_message_in_image(input_image: Image.Image, message: Union[str, bytes], 
     data = file_size_tag + _str_to_bytes(message)
     log.debug(f"{'Files read':<30} in {time() - start:.2f}s")
 
-    if 8 * len(data) > max_bits_to_hide(image, num_lsb, num_channels):
+    if 8 * len(data) > max_bits_to_hide(image, num_lsb, num_channels) and not skip_storage_check:
         raise ValueError(f"Only able to hide {max_bits_to_hide(image, num_lsb, num_channels) // 8} bytes in "
                          f"this image with {num_lsb} LSBs, but {len(data)} bytes were requested")
 
@@ -103,7 +101,7 @@ def hide_message_in_image(input_image: Image.Image, message: Union[str, bytes], 
 
 
 def hide_data(input_image_path: str, input_file_path: str, steg_image_path: str, num_lsb: int,
-              compression_level: int) -> None:
+              compression_level: int, skip_storage_check: bool = False) -> None:
     """Hides the data from the input file in the input image."""
     if input_image_path is None:
         raise ValueError("LSBSteg hiding requires an input image file path")
@@ -113,7 +111,7 @@ def hide_data(input_image_path: str, input_file_path: str, steg_image_path: str,
         raise ValueError("LSBSteg hiding requires an output image file path")
 
     image, input_file = prepare_hide(input_image_path, input_file_path)
-    image = hide_message_in_image(image, input_file.read(), num_lsb)
+    image = hide_message_in_image(image, input_file.read(), num_lsb, skip_storage_check=skip_storage_check)
     input_file.close()
 
     # just in case is_animated is not defined, as suggested by the Pillow documentation
@@ -135,8 +133,8 @@ def recover_message_from_image(input_image: Image.Image, num_lsb: int) -> bytes:
     file_size_tag_size = bytes_in_max_file_size(steg_image, num_lsb, num_channels)
     tag_bit_height = roundup(8 * file_size_tag_size / num_lsb)
 
-    bytes_to_recover = int.from_bytes(
-        lsb_deinterleave_list(color_data[:tag_bit_height], 8 * file_size_tag_size, num_lsb), byteorder=sys.byteorder)
+    bytes_to_recover = int.from_bytes(lsb_deinterleave_list(color_data[:tag_bit_height], 8 * file_size_tag_size,
+                                                            num_lsb), byteorder=sys.byteorder)
 
     maximum_bytes_in_image = (max_bits_to_hide(steg_image, num_lsb, num_channels) // 8 - file_size_tag_size)
     if bytes_to_recover > maximum_bytes_in_image:
@@ -173,10 +171,10 @@ def analysis(image_file_path: str, input_file_path: str, num_lsb: int) -> None:
 
     image = Image.open(image_file_path)
     num_channels = len(image.getbands())
-    print(f"Image resolution: ({image.size[0]}, {image.size[1]})\n"
+    print(f"Image resolution: ({image.size[0]}, {image.size[1]}, {len(image.getbands())})\n"
           f"{f'Using {num_lsb} LSBs, we can hide:':<30} {max_bits_to_hide(image, num_lsb, num_channels) // 8} B")
 
     if input_file_path is not None:
-        print(f"{'Size of input file:':<30} {get_filesize(input_file_path)} B\n")
+        print(f"{'Size of input file:':<30} {get_filesize(input_file_path)} B")
 
     print(f"{'File size tag:':<30} {bytes_in_max_file_size(image, num_lsb, num_channels)} B")
