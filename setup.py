@@ -6,9 +6,7 @@ with open("README.md") as readme_file:
     readme = readme_file.read()
 
 requirements = [
-    # TODO: remove Click restriction after release of 8.1.6 or merge of
-    #  https://github.com/pallets/click/pull/2565
-    "Click<8.1.4", "Pillow", "numpy; python_version>='3.9'",
+    "Click", "Pillow", "numpy; python_version>='3.9'",
     "numpy>=1.15.4,<1.25.0; python_version>='3.8' and python_version<'3.9'"
 ]
 
@@ -16,7 +14,7 @@ setup(
     author="Ryan Gibson",
     author_email="ryanalexandergibson@gmail.com",
     name="stego-lsb",
-    version="1.5.0",
+    version="1.5.1",
     description="stego lsb",
     keywords="stego lsb",
     license="MIT",
