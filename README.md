@@ -10,6 +10,10 @@
 * [LSBSteg](#lsbsteg)
 * [StegDetect](#stegdetect)
 
+If you are unfamiliar with steganography techniques, I have also written a
+basic overview of the field in
+[Steganography: Hiding Data Inside Data](https://ryanagibson.com/posts/steganography-intro/).
+
 ## Installation
 
 This project is on [PyPI](https://pypi.org/project/stego-lsb/) and can be
