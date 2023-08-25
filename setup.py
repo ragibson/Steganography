@@ -7,14 +7,14 @@ with open("README.md") as readme_file:
 
 requirements = [
     "Click", "Pillow", "numpy; python_version>='3.9'",
-    "numpy>=1.15.4,<1.25.0; python_version>='3.8' and python_version<'3.9'"
+    "numpy<1.25.0; python_version>='3.8' and python_version<'3.9'"
 ]
 
 setup(
     author="Ryan Gibson",
     author_email="ryanalexandergibson@gmail.com",
     name="stego-lsb",
-    version="1.5.1",
+    version="1.5.2",
     description="stego lsb",
     keywords="stego lsb",
     license="MIT",
