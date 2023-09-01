@@ -12,11 +12,13 @@ requirements = [
 
 setup(
     author="Ryan Gibson",
-    author_email="ryanalexandergibson@gmail.com",
+    author_email="ryan.alex.gibson@gmail.com",
     name="stego-lsb",
-    version="1.5.2",
-    description="stego lsb",
-    keywords="stego lsb",
+    version="1.5.3",
+    description="Least Significant Bit Steganography for bitmap images (.bmp "
+                "and .png), WAV sound files, and byte sequences. Simple LSB "
+                "Steganalysis (LSB extraction) for bitmap images.",
+    keywords="steganography steganalysis",
     license="MIT",
     long_description=readme,
     long_description_content_type="text/markdown",
