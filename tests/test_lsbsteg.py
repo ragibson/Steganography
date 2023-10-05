@@ -4,7 +4,7 @@ import os
 
 from PIL import Image
 from stego_lsb.bit_manipulation import roundup
-from stego_lsb.LSBSteg import hide_data, recover_data, prepare_hide
+from stego_lsb.LSBSteg import hide_data, recover_data
 import pytest
 import string
 import unittest
