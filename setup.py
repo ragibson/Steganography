@@ -14,7 +14,7 @@ setup(
     author="Ryan Gibson",
     author_email="ryan.alex.gibson@gmail.com",
     name="stego-lsb",
-    version="1.5.3",
+    version="1.5.4",
     description="Least Significant Bit Steganography for bitmap images (.bmp "
                 "and .png), WAV sound files, and byte sequences. Simple LSB "
                 "Steganalysis (LSB extraction) for bitmap images.",
@@ -43,6 +43,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3 :: Only",
     ],
 )

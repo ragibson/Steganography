@@ -28,7 +28,7 @@ class TestWavSteg(unittest.TestCase):
 
             data = np.random.randint(0, 2 ** (8 * sample_width), dtype=dtype, size=num_frames * num_channels)
             # note: typing does not recognize that "writeframes() accepts any bytes-like object" (see documentation)
-            file.writeframes(data)  # type: ignore
+            file.writeframes(data)  # type: ignore[arg-type,unused-ignore]
 
     def write_random_file(self, filename: str, num_bytes: int) -> None:
         with open(filename, "wb") as file:
