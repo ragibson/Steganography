@@ -26,8 +26,6 @@ from typing import List
 import numpy as np
 import os
 
-byte_depth_to_dtype = {1: np.uint8, 2: np.uint16, 4: np.uint32, 8: np.uint64}
-
 
 def roundup(x: float, base: int = 1) -> int:
     return int(ceil(x / base)) * base
@@ -53,10 +51,8 @@ def lsb_interleave_bytes(carrier: bytes, payload: bytes, num_lsb: int, truncate:
     bit_height = roundup(plen * 8 / num_lsb)
     payload_bits.resize(bit_height * num_lsb)
 
-    carrier_dtype = byte_depth_to_dtype[byte_depth]
-    carrier_bits = np.unpackbits(np.frombuffer(carrier, dtype=carrier_dtype, count=bit_height).view(np.uint8)
+    carrier_bits = np.unpackbits(np.frombuffer(carrier, dtype=np.uint8, count=byte_depth * bit_height)
                                  ).reshape(bit_height, 8 * byte_depth)
-
     carrier_bits[:, 8 * byte_depth - num_lsb: 8 * byte_depth] = payload_bits.reshape(bit_height, num_lsb)
 
     ret = np.packbits(carrier_bits).tobytes()
@@ -75,8 +71,7 @@ def lsb_deinterleave_bytes(carrier: bytes, num_bits: int, num_lsb: int, byte_dep
     """
 
     plen = roundup(num_bits / num_lsb)
-    carrier_dtype = byte_depth_to_dtype[byte_depth]
-    payload_bits = np.unpackbits(np.frombuffer(carrier, dtype=carrier_dtype, count=plen).view(np.uint8)
+    payload_bits = np.unpackbits(np.frombuffer(carrier, dtype=np.uint8, count=byte_depth * plen)
                                  ).reshape(plen, 8 * byte_depth)[:, 8 * byte_depth - num_lsb: 8 * byte_depth]
     return np.packbits(payload_bits).tobytes()[: num_bits // 8]
 
