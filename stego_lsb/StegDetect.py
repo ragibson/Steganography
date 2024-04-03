@@ -36,8 +36,7 @@ def show_lsb(image_path: str, n: int) -> None:
             for rgb in image_data
         ]
 
-        # TODO: image.putdata() appears to have buggy typing?
-        image.putdata(color_data)  # type: ignore
+        image.putdata(color_data)
         log.debug(f"Runtime: {time() - start:.2f}s")
         file_name, file_extension = os.path.splitext(image_path)
         image.save(f"{file_name}_{n}LSBs{file_extension}")
