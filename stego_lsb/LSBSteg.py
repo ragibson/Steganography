@@ -92,7 +92,7 @@ def hide_message_in_image(input_image: Image.Image, message: Union[str, bytes], 
 
     start = time()
     # PIL expects a sequence of tuples, one per pixel TODO: this expression is too complicated for typing to handle?
-    input_image.putdata(cast(List[int], list(zip(*[iter(flattened_color_data)] * num_channels))))
+    input_image.putdata(cast(List[int], list(zip(*[iter(flattened_color_data)] * num_channels))))  # type: ignore
     log.debug(f"{'Image overwritten':<30} in {time() - start:.2f}s")
     return input_image
 
