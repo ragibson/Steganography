@@ -15,9 +15,11 @@ TODO: should this be refactored more? I am trusting that @sh4nks implemented thi
 :copyright: (c) 2015 by Ryan Gibson, see AUTHORS.md for more details.
 :license: MIT License, see LICENSE.md for more details.
 """
-from stego_lsb import LSBSteg, StegDetect, WavSteg, bit_manipulation
-import click
 import logging
+
+import click
+
+from stego_lsb import LSBSteg, StegDetect, WavSteg, bit_manipulation
 
 # enable logging output
 logging.basicConfig(format="%(message)s", level=logging.INFO)

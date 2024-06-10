@@ -1,13 +1,14 @@
-from random import choice
-import numpy as np
 import os
-
-from PIL import Image
-from stego_lsb.bit_manipulation import roundup
-from stego_lsb.LSBSteg import hide_data, recover_data
-import pytest
 import string
 import unittest
+from random import choice
+
+import numpy as np
+import pytest
+from PIL import Image
+
+from stego_lsb.LSBSteg import hide_data, recover_data
+from stego_lsb.bit_manipulation import roundup
 
 
 class TestLSBSteg(unittest.TestCase):

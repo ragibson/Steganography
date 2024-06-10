@@ -1,6 +1,8 @@
-from stego_lsb.bit_manipulation import lsb_interleave_bytes, lsb_deinterleave_bytes
-import numpy as np
 import unittest
+
+import numpy as np
+
+from stego_lsb.bit_manipulation import lsb_interleave_bytes, lsb_deinterleave_bytes
 
 
 class TestBitManipulation(unittest.TestCase):

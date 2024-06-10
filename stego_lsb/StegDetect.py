@@ -10,11 +10,12 @@
     :copyright: (c) 2015 by Ryan Gibson, see AUTHORS.md for more details.
     :license: MIT License, see LICENSE.md for more details.
 """
-from PIL import Image
-from time import time
-from typing import cast, Tuple, Iterable
 import logging
 import os
+from time import time
+from typing import cast, Tuple, Iterable
+
+from PIL import Image
 
 log = logging.getLogger(__name__)
 

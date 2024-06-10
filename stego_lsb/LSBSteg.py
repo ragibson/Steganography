@@ -9,17 +9,19 @@
     :copyright: (c) 2015 by Ryan Gibson, see AUTHORS.md for more details.
     :license: MIT License, see LICENSE.md for more details.
 """
+import logging
+import os
+import sys
+from time import time
+from typing import Tuple, IO, Union, List, cast
+
 from PIL import Image
+
 from stego_lsb.bit_manipulation import (
     lsb_deinterleave_list,
     lsb_interleave_list,
     roundup,
 )
-from time import time
-from typing import Tuple, IO, Union, List, cast
-import logging
-import os
-import sys
 
 log = logging.getLogger(__name__)
 

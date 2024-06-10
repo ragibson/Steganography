@@ -9,12 +9,13 @@
     :copyright: (c) 2015 by Ryan Gibson, see AUTHORS.md for more details.
     :license: MIT License, see LICENSE.md for more details.
 """
-from stego_lsb.bit_manipulation import lsb_deinterleave_bytes, lsb_interleave_bytes
-from time import time
 import logging
 import math
 import os
 import wave
+from time import time
+
+from stego_lsb.bit_manipulation import lsb_deinterleave_bytes, lsb_interleave_bytes
 
 log = logging.getLogger(__name__)
 

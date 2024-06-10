@@ -1,11 +1,13 @@
-import numpy as np
 import os
-from random import choice
-from stego_lsb.WavSteg import hide_data, recover_data
 import string
-from typing import Any, Type
 import unittest
 import wave
+from random import choice
+from typing import Any, Type
+
+import numpy as np
+
+from stego_lsb.WavSteg import hide_data, recover_data
 
 
 class TestWavSteg(unittest.TestCase):
