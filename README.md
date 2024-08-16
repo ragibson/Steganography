@@ -27,6 +27,9 @@ Alternatively, you can install it from this repository directly:
     cd Steganography
     python3 setup.py install
 
+After installation, use the `stegolsb` command in the terminal or import
+functions from `stego_lsb` in your code.
+
 ## Byte Sequence Manipulation
 
 bit_manipulation provides the ability to (quickly) interleave the bytes of a
