@@ -28,9 +28,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m venv env
           source env/bin/activate
-          pip install "numpy<2.1"  # temporary solution for apparently broken numpy release candidate
           pip install setuptools
-          pip install cython flake8 pytest
+          pip install numpy cython flake8 pytest
           python setup.py install
       - name: Lint with flake8
         run: |
