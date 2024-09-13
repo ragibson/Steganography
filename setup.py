@@ -15,7 +15,7 @@ setup(
     author="Ryan Gibson",
     author_email="ryan.alex.gibson@gmail.com",
     name="stego-lsb",
-    version="1.6.1",
+    version="1.6.2",
     description="Least Significant Bit Steganography for bitmap images (.bmp "
                 "and .png), WAV sound files, and byte sequences. Simple LSB "
                 "Steganalysis (LSB extraction) for bitmap images.",
