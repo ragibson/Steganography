@@ -25,11 +25,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           python -m venv env
           source env/bin/activate
+          python -m pip install --upgrade pip
           pip install setuptools
-          pip install numpy cython flake8 pytest
+          pip install cython flake8 pytest
           python setup.py install
       - name: Lint with flake8
         run: |

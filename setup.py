@@ -6,7 +6,8 @@ with open("README.md") as readme_file:
     readme = readme_file.read()
 
 requirements = [
-    "Click", "Pillow", "numpy; python_version>='3.9'",
+    "Click", "Pillow", "numpy; python_version>='3.10'",
+    "numpy<2.1.0; python_version>='3.9' and python_version<'3.10'",
     "numpy<1.25.0; python_version>='3.8' and python_version<'3.9'"
 ]
 
