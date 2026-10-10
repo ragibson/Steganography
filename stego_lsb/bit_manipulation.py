@@ -85,7 +85,7 @@ def lsb_interleave_list(carrier: List[np.uint8], payload: bytes, num_lsb: int) -
     bit_height = roundup(8 * len(payload) / num_lsb)
     carrier_bytes = np.array(carrier[:bit_height], dtype=np.uint8).tobytes()
     interleaved = lsb_interleave_bytes(carrier_bytes, payload, num_lsb, truncate=True)
-    carrier[:bit_height] = np.frombuffer(interleaved, dtype=np.uint8).tolist()
+    carrier[:bit_height] = np.frombuffer(interleaved, dtype=np.uint8)
     return carrier
 
 
