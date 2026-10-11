@@ -9,7 +9,7 @@ description = """Least Significant Bit Steganography for bitmap images (.bmp and
 sequences. Simple LSB Steganalysis (LSB extraction) for bitmap images."""
 readme = "README.md"
 requires-python = ">=3.8"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
     { name = "Ryan Gibson", email = "ryan.alex.gibson@gmail.com" },
 ]
