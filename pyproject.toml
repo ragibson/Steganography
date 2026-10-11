@@ -5,8 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "stego-lsb"
 version = "1.7.2"
-description = """Least Significant Bit Steganography for bitmap images (.bmp and .png), WAV sound files, and byte
-sequences. Simple LSB Steganalysis (LSB extraction) for bitmap images."""
+description = "Least Significant Bit Steganography for bitmap images (.bmp and .png), WAV sound files, and byte sequences. Simple LSB Steganalysis (LSB extraction) for bitmap images."
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
