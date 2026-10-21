@@ -52,5 +52,5 @@ source = ["stego_lsb", "tests"]
 branch = true
 
 [tool.coverage.report]
-fail_under = 60  # quite low, need to test CLI usage?
+fail_under = 80
 show_missing = true

@@ -3,7 +3,7 @@ import string
 import unittest
 import wave
 from random import choice
-from typing import Any, Type
+from typing import Type
 
 import numpy as np
 

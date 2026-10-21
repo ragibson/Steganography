@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from stego_lsb.bit_manipulation import lsb_interleave_bytes, lsb_deinterleave_bytes
+from stego_lsb.bit_manipulation import lsb_interleave_bytes, lsb_deinterleave_bytes, test
 
 
 class TestBitManipulation(unittest.TestCase):
@@ -56,6 +56,9 @@ class TestBitManipulation(unittest.TestCase):
 
     def test_interleaving_consistency_64bit(self) -> None:
         self.check_random_interleaving(byte_depth=8)
+
+    def test_consistency_test_function(self) -> None:
+        self.assertTrue(test())
 
 
 if __name__ == "__main__":
