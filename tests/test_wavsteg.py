@@ -22,7 +22,7 @@ class TestWavSteg(unittest.TestCase):
             file.setsampwidth(sample_width)
             file.setframerate(framerate)
 
-            dtype: Type[np.unsignedinteger[Any]]
+            dtype: Type[np.uint8 | np.uint16 | np.uint32]
             if sample_width == 1:
                 dtype = np.uint8
             elif sample_width == 2:
