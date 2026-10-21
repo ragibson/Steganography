@@ -42,7 +42,7 @@ jobs:
         run: |
           source env/bin/activate
           python -m pip install mypy
-          python -m mypy --install-types --non-interactive stego_lsb
+          python -m mypy --install-types --non-interactive
       - name: Test with pytest and code coverage
         run: |
           source env/bin/activate

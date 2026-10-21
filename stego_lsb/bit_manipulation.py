@@ -50,7 +50,7 @@ def lsb_interleave_bytes(carrier: bytes, payload: bytes, num_lsb: int, truncate:
     payload_bits[:plen, :] = np.unpackbits(np.frombuffer(payload, dtype=np.uint8, count=plen)).reshape(plen, 8)
 
     bit_height = roundup(plen * 8 / num_lsb)
-    payload_bits.resize(bit_height * num_lsb)
+    payload_bits = np.resize(payload_bits, (bit_height * num_lsb, 1))
 
     carrier_bits = np.unpackbits(np.frombuffer(carrier, dtype=np.uint8, count=byte_depth * bit_height)
                                  ).reshape(bit_height, 8 * byte_depth)
