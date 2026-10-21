@@ -39,6 +39,8 @@ jobs:
           # exit-zero treats all errors as warnings
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics --exclude env/
       - name: Type checking with mypy
+        # numpy no longer supports <3.12, so typing is unreliable
+        if: ${{ !contains(fromJSON('["3.10", "3.11"]'), matrix.python-version) }}
         run: |
           source env/bin/activate
           python -m pip install mypy
