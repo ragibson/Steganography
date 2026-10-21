@@ -7,7 +7,7 @@ name = "stego-lsb"
 version = "1.7.2"
 description = "Least Significant Bit Steganography for bitmap images (.bmp and .png), WAV sound files, and byte sequences. Simple LSB Steganalysis (LSB extraction) for bitmap images."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "MIT"
 authors = [
     { name = "Ryan Gibson", email = "ryan.alex.gibson@gmail.com" },
@@ -19,7 +19,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -32,9 +31,7 @@ classifiers = [
 dependencies = [
     "Click",
     "Pillow",
-    "numpy; python_version >= '3.10'",
-    "numpy < 2.1.0; python_version >= '3.9' and python_version < '3.10'",
-    "numpy < 1.25.0; python_version >= '3.8' and python_version < '3.9'",
+    "numpy"
 ]
 
 [project.urls]
