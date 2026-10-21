@@ -48,3 +48,12 @@ include = ["stego_lsb"]
 
 [tool.setuptools.package-data]
 stego_lsb = ["py.typed"]
+
+[tool.coverage.run]
+# a bit strange to include tests, but this is recommended by coverage.py
+source = ["stego_lsb", "tests"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 60  # quite low, need to test CLI usage?
+show_missing = true

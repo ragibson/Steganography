@@ -29,7 +29,7 @@ jobs:
           source env/bin/activate
           python -m pip install --upgrade pip
           pip install setuptools
-          pip install cython flake8 pytest
+          pip install cython flake8 pytest pytest-cov
           pip install .
       - name: Lint with flake8
         run: |
@@ -43,7 +43,7 @@ jobs:
           source env/bin/activate
           python -m pip install mypy
           python -m mypy --install-types --non-interactive stego_lsb
-      - name: Test with pytest
+      - name: Test with pytest and code coverage
         run: |
           source env/bin/activate
-          pytest
+          pytest -v --cov
