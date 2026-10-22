@@ -5,47 +5,39 @@ name: Python package
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
+
+permissions:
+  contents: read
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14", "3.15" ]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
+          cache: "pip"
+          cache-dependency-path: pyproject.toml
       - name: Install dependencies
         run: |
-          python -m venv env
-          source env/bin/activate
           python -m pip install --upgrade pip
-          pip install setuptools
-          pip install cython flake8 pytest pytest-cov
+          pip install cython flake8 mypy pytest pytest-cov pytest-xdist
           pip install .
       - name: Lint with flake8
-        run: |
-          source env/bin/activate
-          # stop the build if there are Python syntax errors or undefined names
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude env/
-          # exit-zero treats all errors as warnings
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics --exclude env/
+        # strict failures on any linting issues
+        run: flake8 . --count --max-complexity=10 --max-line-length=120 --show-source --statistics
       - name: Type checking with mypy
         # numpy no longer supports <3.12, so typing is unreliable
-        if: ${{ !contains(fromJSON('["3.10", "3.11"]'), matrix.python-version) }}
-        run: |
-          source env/bin/activate
-          python -m pip install mypy
-          python -m mypy --install-types --non-interactive
+        if: ${{ runner.os == 'Linux' && !contains(fromJSON('["3.10", "3.11"]'), matrix.python-version) }}
+        run: mypy --install-types --non-interactive
       - name: Test with pytest and code coverage
-        run: |
-          source env/bin/activate
-          pytest -v --cov
+        run: pytest -v -n auto --cov
