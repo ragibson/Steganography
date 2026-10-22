@@ -34,7 +34,7 @@ jobs:
           pip install .
       - name: Lint with flake8
         # strict failures on any linting issues
-        run: flake8 . --count --max-complexity=10 --max-line-length=120 --show-source --statistics
+        run: flake8 .
       - name: Type checking with mypy
         # numpy no longer supports <3.12, so typing is unreliable
         if: ${{ runner.os == 'Linux' && !contains(fromJSON('["3.10", "3.11"]'), matrix.python-version) }}
